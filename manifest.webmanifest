@@ -1,0 +1,17 @@
+{
+  "name": "NutriLog – Θερμίδες & Διατροφή",
+  "short_name": "NutriLog",
+  "description": "Καταγραφή θερμίδων και μακροθρεπτικών, streak προόδου και AI ανάλυση γευμάτων.",
+  "lang": "el",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f6f2",
+  "theme_color": "#2f9e5b",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

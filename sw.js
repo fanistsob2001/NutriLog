@@ -1,6 +1,6 @@
 // Service worker: κρατά την εφαρμογή διαθέσιμη χωρίς σύνδεση και εμφανίζει τις ειδοποιήσεις push.
 // Άλλαξε το VERSION όταν ανεβάζεις νέα έκδοση ώστε να ανανεωθεί η cache.
-const VERSION = 'nutrilog-v4';
+const VERSION = 'nutrilog-v5';
 const SHELL = ['./', './index.html', './config.js', './privacy.html', './terms.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 const CDN = 'cdn.jsdelivr.net';
 
@@ -18,7 +18,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET') return;
   // Βιβλιοθήκες από το CDN (με σταθερή έκδοση): cache-first.
-  if (url.host === CDN) {
+  if (url.host === CDN || url.host === 'fonts.googleapis.com' || url.host === 'fonts.gstatic.com') {
     e.respondWith(caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
       const copy = res.clone();
       caches.open(VERSION).then(c => c.put(e.request, copy));

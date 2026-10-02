@@ -2,8 +2,11 @@
 // Ο μοναδικός τόπος όπου χρησιμοποιείται το Gemini API key. Η εφαρμογή δεν το βλέπει ποτέ:
 // στέλνει εδώ το αίτημα μαζί με το token του συνδεδεμένου χρήστη, και η function
 //   1. ελέγχει ότι ο χρήστης είναι συνδεδεμένος,
-//   2. μετρά το ημερήσιο όριο αιτημάτων του,
+//   2. μετρά το ημερήσιο όριο αιτημάτων του (εκτός αν είναι στο public.ai_unlimited),
 //   3. καλεί το Gemini με το κρυφό κλειδί (secret GEMINI_API_KEY).
+//
+// Ενέργειες: models, analyze (φωτογραφία/περιγραφή), chat (βοηθός, μπορεί να προτείνει καταγραφή),
+//            suggest (προτάσεις γευμάτων), review (εβδομαδιαία ανασκόπηση).
 //
 // Secrets (Supabase → Edge Functions → Secrets):
 //   GEMINI_API_KEY   (υποχρεωτικό) το κλειδί από το Google AI Studio
@@ -60,7 +63,9 @@ function publicList(ids: string[]): string[] {
 const isGone = (status: number, msg = '') =>
   status === 404 || /no longer available|not found|not supported|deprecated|update your code/i.test(msg);
 
-async function generate(requested: string, payload: unknown) {
+type Part = { text?: string; thought?: boolean; functionCall?: { name: string; args: Record<string, unknown> } };
+
+async function generateRaw(requested: string, payload: unknown): Promise<{ parts: Part[]; model: string; finish?: string; block?: string }> {
   const ids = await listModels();
   let model = requested && ids.includes(requested) ? requested : autoPick(ids);
   const post = async (m: string) => {
@@ -82,50 +87,70 @@ async function generate(requested: string, payload: unknown) {
     throw new HttpError(502, `Σφάλμα AI: ${res.msg ?? `HTTP ${res.status}`}`);
   }
   const cand = res.data?.candidates?.[0];
-  const text = ((cand?.content?.parts ?? []) as { text?: string; thought?: boolean }[])
-    .filter((p) => p.text && !p.thought).map((p) => p.text).join('');
-  if (!text) {
-    const why = res.data?.promptFeedback?.blockReason ?? cand?.finishReason ?? 'άγνωστο';
-    throw new HttpError(502, `Το AI δεν έδωσε απάντηση (${why}). Δοκίμασε ξανά.`);
+  return { parts: (cand?.content?.parts ?? []) as Part[], model, finish: cand?.finishReason, block: res.data?.promptFeedback?.blockReason };
+}
+const textOf = (parts: Part[]) => parts.filter((p) => p.text && !p.thought).map((p) => p.text).join('');
+
+async function generateJson(requested: string, prompt: string, schema: unknown, image?: string, temperature = 0.3) {
+  const parts: unknown[] = [{ text: prompt }];
+  if (image) parts.push({ inlineData: { mimeType: 'image/jpeg', data: image } });
+  const r = await generateRaw(requested, {
+    contents: [{ role: 'user', parts }],
+    generationConfig: { temperature, responseMimeType: 'application/json', responseSchema: schema },
+  });
+  const text = textOf(r.parts);
+  if (!text) throw new HttpError(502, `Το AI δεν έδωσε απάντηση (${r.block ?? r.finish ?? 'άγνωστο'}). Δοκίμασε ξανά.`);
+  try {
+    return { result: JSON.parse(text.replace(/^\s*```(?:json)?/, '').replace(/```\s*$/, '')), model: r.model };
+  } catch {
+    throw new HttpError(502, 'Το AI επέστρεψε μη έγκυρη απάντηση. Δοκίμασε ξανά.');
   }
-  return { text, model };
 }
 
 /* ---------- Βοηθητικά ---------- */
 const num = (v: unknown) => (Number.isFinite(Number(v)) ? Math.round(Number(v)) : 0);
 const str = (v: unknown, max: number) => String(v ?? '').slice(0, max);
+const MEAL_NAMES: Record<string, string> = { breakfast: 'Πρωινό', lunch: 'Μεσημεριανό', dinner: 'Βραδινό', snack: 'Σνακ' };
 function contextText(c: Record<string, any> = {}) {
   const g = c.goals ?? {}, t = c.today ?? {};
   const goalName: Record<string, string> = { lose: 'απώλεια βάρους', lose_slow: 'ήπια απώλεια βάρους', maintain: 'διατήρηση βάρους', gain: 'αύξηση μυϊκής μάζας' };
+  const items = (Array.isArray(c.todayItems) ? c.todayItems : []).slice(0, 30)
+    .map((i: any) => `${MEAL_NAMES[i.meal] ?? i.meal}: ${str(i.name, 60)}${i.grams ? ` ${num(i.grams)}g` : ''} (${num(i.kcal)} kcal)`).join('; ');
+  const favs = (Array.isArray(c.favorites) ? c.favorites : []).slice(0, 20).map((f: unknown) => str(f, 50)).join(', ');
   return `Χρήστης: ${str(c.name, 40) || 'χωρίς όνομα'} · στόχος: ${goalName[c.goal] ?? 'διατήρηση βάρους'}.
 Ημερήσιοι στόχοι: ${num(g.kcal)} kcal, πρωτεΐνη ${num(g.protein)}g, υδατάνθρακες ${num(g.carbs)}g, λιπαρά ${num(g.fat)}g, ίνες ${num(g.fiber)}g, νερό ${num(g.water)}ml.
 Μέχρι τώρα σήμερα: ${num(t.kcal)} kcal, πρωτεΐνη ${num(t.protein)}g, υδατάνθρακες ${num(t.carbs)}g, λιπαρά ${num(t.fat)}g, ίνες ${num(t.fiber)}g, νερό ${num(t.water)}ml.
-Streak: ${num(c.streak)} μέρες (καλύτερο ${num(c.bestStreak)}). Ανοχή streak: ±${num(c.tolerance) || 10}%${c.requireProtein ? ', απαιτείται και πρωτεΐνη ≥90%' : ''}.`;
+Σημερινές καταχωρήσεις: ${items || 'καμία'}.
+Τρόφιμα που τρώει συχνά: ${favs || '—'}.
+Streak: ${num(c.streak)} μέρες (καλύτερο ${num(c.bestStreak)}). Ανοχή streak: ±${num(c.tolerance) || 10}%${c.requireProtein ? ', απαιτείται και πρωτεΐνη ≥90%' : ''}.
+Τοπική ώρα χρήστη: ${str(c.localTime, 20) || 'άγνωστη'}.`;
 }
 
-/* ---------- Ανάλυση γεύματος ---------- */
+/* ---------- Σχήματα ---------- */
+const ITEM_PROPS = {
+  name: { type: 'STRING' }, grams: { type: 'NUMBER' }, kcal: { type: 'NUMBER' }, protein: { type: 'NUMBER' },
+  carbs: { type: 'NUMBER' }, fat: { type: 'NUMBER' }, fiber: { type: 'NUMBER' }, sugar: { type: 'NUMBER' },
+  sodium: { type: 'NUMBER', description: 'νάτριο σε mg' }, satfat: { type: 'NUMBER', description: 'κορεσμένα λιπαρά σε g' },
+  calcium: { type: 'NUMBER', description: 'ασβέστιο σε mg' }, iron: { type: 'NUMBER', description: 'σίδηρος σε mg' },
+  potassium: { type: 'NUMBER', description: 'κάλιο σε mg' }, vitc: { type: 'NUMBER', description: 'βιταμίνη C σε mg' },
+};
+const ITEM_REQ = ['name', 'grams', 'kcal', 'protein', 'carbs', 'fat', 'fiber', 'sugar', 'sodium', 'satfat', 'calcium', 'iron', 'potassium', 'vitc'];
+const ITEM = { type: 'OBJECT', properties: ITEM_PROPS, required: ITEM_REQ };
+const ITEM_RULES = `Για κάθε στοιχείο δώσε τιμές για ΟΛΗ την ποσότητα (όχι ανά 100g): kcal, πρωτεΐνη, υδατάνθρακες, λιπαρά, φυτικές ίνες, σάκχαρα (g), νάτριο (mg), κορεσμένα λιπαρά (g), ασβέστιο (mg), σίδηρο (mg), κάλιο (mg), βιταμίνη C (mg). Ονόματα στα ελληνικά.`;
+
 const MEAL_SCHEMA = {
   type: 'OBJECT',
   properties: {
     is_food: { type: 'BOOLEAN' },
     dish: { type: 'STRING' },
-    items: {
-      type: 'ARRAY',
-      items: {
-        type: 'OBJECT',
-        properties: {
-          name: { type: 'STRING' }, grams: { type: 'NUMBER' }, kcal: { type: 'NUMBER' }, protein: { type: 'NUMBER' },
-          carbs: { type: 'NUMBER' }, fat: { type: 'NUMBER' }, fiber: { type: 'NUMBER' }, sugar: { type: 'NUMBER' },
-        },
-        required: ['name', 'grams', 'kcal', 'protein', 'carbs', 'fat', 'fiber', 'sugar'],
-      },
-    },
+    items: { type: 'ARRAY', items: ITEM },
     confidence: { type: 'STRING', enum: ['low', 'medium', 'high'] },
     notes: { type: 'STRING' },
   },
   required: ['is_food', 'dish', 'items', 'confidence', 'notes'],
 };
 
+/* ---------- Ανάλυση γεύματος ---------- */
 async function analyze(body: Record<string, any>) {
   const image = typeof body.image === 'string' ? body.image : '';
   const desc = str(body.desc, 600).trim();
@@ -133,79 +158,148 @@ async function analyze(body: Record<string, any>) {
   if (image.length > 4_000_000) throw new HttpError(413, 'Η φωτογραφία είναι πολύ μεγάλη.');
   const prompt = `Είσαι έμπειρος διαιτολόγος. Ανάλυσε το γεύμα${image ? ' της φωτογραφίας' : ' που περιγράφει ο χρήστης'}.
 - Αναγνώρισε κάθε τρόφιμο/συστατικό ξεχωριστά και εκτίμησε την ποσότητα σε γραμμάρια (χρησιμοποίησε πιάτο, μαχαιροπίρουνα κ.λπ. ως μέτρο σύγκρισης).
-- Για κάθε στοιχείο δώσε kcal, πρωτεΐνη, υδατάνθρακες, λιπαρά, φυτικές ίνες και σάκχαρα (g) για ΟΛΗ την εκτιμώμενη ποσότητα, όχι ανά 100g.
+- ${ITEM_RULES}
 - Αν είναι πιθανό να υπάρχει λάδι μαγειρέματος ή σάλτσα, πρόσθεσέ τα ως ξεχωριστό στοιχείο.
-- Ονόματα στα ελληνικά. Στο "dish" δώσε σύντομο όνομα για όλο το γεύμα.
+- Στο "dish" δώσε σύντομο όνομα για όλο το γεύμα.
 - Στο "notes" γράψε 2-3 σύντομες προτάσεις στα ελληνικά: διατροφική αξιολόγηση και πώς ταιριάζει με τους στόχους του χρήστη.
 - Αν δεν πρόκειται για φαγητό/ποτό, βάλε is_food=false και κενή λίστα items.
 ${contextText(body.context)}${desc ? `\nΣημειώσεις/περιγραφή από τον χρήστη: ${desc}` : ''}`;
-  const parts: unknown[] = [{ text: prompt }];
-  if (image) parts.push({ inlineData: { mimeType: 'image/jpeg', data: image } });
-  const { text, model } = await generate(str(body.model, 80), {
-    contents: [{ role: 'user', parts }],
-    generationConfig: { temperature: 0.2, responseMimeType: 'application/json', responseSchema: MEAL_SCHEMA },
-  });
-  try {
-    return { result: JSON.parse(text.replace(/^\s*```(?:json)?/, '').replace(/```\s*$/, '')), model };
-  } catch {
-    throw new HttpError(502, 'Το AI επέστρεψε μη έγκυρη απάντηση. Δοκίμασε ξανά.');
-  }
+  return generateJson(str(body.model, 80), prompt, MEAL_SCHEMA, image, 0.2);
+}
+
+/* ---------- Προτάσεις γευμάτων ---------- */
+const SUGGEST_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    intro: { type: 'STRING' },
+    suggestions: {
+      type: 'ARRAY',
+      items: {
+        type: 'OBJECT',
+        properties: { title: { type: 'STRING' }, why: { type: 'STRING' }, items: { type: 'ARRAY', items: ITEM } },
+        required: ['title', 'why', 'items'],
+      },
+    },
+  },
+  required: ['intro', 'suggestions'],
+};
+async function suggest(body: Record<string, any>) {
+  const meal = MEAL_NAMES[body.meal] ? body.meal : 'snack';
+  const prompt = `Είσαι διαιτολόγος. Πρότεινε 3 διαφορετικές, ρεαλιστικές επιλογές για ${MEAL_NAMES[meal]} που ταιριάζουν στα υπόλοιπα της ημέρας του χρήστη.
+- Λάβε υπόψη πόσες θερμίδες και μακροθρεπτικά του μένουν για σήμερα και τι έχει ήδη φάει. Αν μένει πρωτεΐνη, δώσε προτεραιότητα σε αυτή.
+- Χρησιμοποίησε τρόφιμα που βρίσκει κανείς εύκολα σε ελληνικό σούπερ μάρκετ, και προτίμησε όσα τρώει συχνά ο χρήστης όταν ταιριάζουν.
+- Απλές συνταγές (έως 15 λεπτά) ή έτοιμες επιλογές. Ποικιλία: τουλάχιστον μία πολύ εύκολη επιλογή.
+- "title": σύντομο όνομα. "why": μία πρόταση γιατί ταιριάζει (π.χ. «καλύπτει 35g από την πρωτεΐνη που σου λείπει»). "intro": μία πρόταση με το τι του μένει.
+- ${ITEM_RULES}
+${str(body.wish, 200) ? `Επιθυμία χρήστη: ${str(body.wish, 200)}\n` : ''}${contextText(body.context)}`;
+  return generateJson(str(body.model, 80), prompt, SUGGEST_SCHEMA, undefined, 0.8);
+}
+
+/* ---------- Εβδομαδιαία ανασκόπηση ---------- */
+const REVIEW_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    headline: { type: 'STRING' },
+    score: { type: 'NUMBER', description: '0-100 βαθμός συνέπειας της εβδομάδας' },
+    summary: { type: 'STRING' },
+    wins: { type: 'ARRAY', items: { type: 'STRING' } },
+    improve: { type: 'ARRAY', items: { type: 'STRING' } },
+    next_goal: { type: 'STRING' },
+  },
+  required: ['headline', 'score', 'summary', 'wins', 'improve', 'next_goal'],
+};
+async function review(body: Record<string, any>) {
+  const days = (Array.isArray(body.week) ? body.week : []).slice(0, 7).map((d: any) =>
+    `${str(d.date, 10)} (${str(d.weekday, 12)}): ${d.status === 'none' ? 'χωρίς καταγραφή' : `${num(d.kcal)} kcal, Π ${num(d.protein)}g, Υ ${num(d.carbs)}g, Λ ${num(d.fat)}g, ίνες ${num(d.fiber)}g, σάκχαρα ${num(d.sugar)}g, νερό ${num(d.water)}ml, ${num(d.entries)} καταχωρήσεις, ${d.status === 'hit' ? 'εντός στόχου' : d.status === 'freeze' ? 'πάγωμα streak' : 'εκτός στόχου'}`}${d.weight ? `, βάρος ${Number(d.weight)}kg` : ''}`).join('\n');
+  if (!days) throw new HttpError(400, 'Δεν υπάρχουν δεδομένα για αυτή την εβδομάδα.');
+  const prompt = `Είσαι υποστηρικτικός διαιτολόγος-coach. Γράψε την εβδομαδιαία ανασκόπηση του χρήστη στα ελληνικά, σε β' ενικό, θετικά αλλά ειλικρινά.
+- "headline": μία φράση-τίτλος (με ένα emoji).
+- "score": 0-100 με βάση τη συνέπεια (μέρες εντός στόχου, μέρες καταγραφής, πρωτεΐνη, νερό).
+- "summary": 2-3 προτάσεις με τα σημαντικότερα, με συγκεκριμένους αριθμούς.
+- "wins": 2-3 συγκεκριμένα πράγματα που πήγαν καλά.
+- "improve": 2-3 συγκεκριμένα, πρακτικά σημεία βελτίωσης (π.χ. «τα Σαββατοκύριακα ξεπερνάς κατά ~400 kcal»).
+- "next_goal": ένας μικρός, μετρήσιμος στόχος για την επόμενη εβδομάδα.
+Αν υπάρχουν λίγες καταγραφές, ενθάρρυνε την καταγραφή χωρίς να κατηγορείς.
+
+Ημερήσιες τιμές της εβδομάδας:
+${days}
+
+${contextText(body.context)}`;
+  return generateJson(str(body.model, 80), prompt, REVIEW_SCHEMA, undefined, 0.5);
 }
 
 /* ---------- Βοηθός Nutri ---------- */
 const APP_GUIDE = `Είσαι ο «Nutri», ο φιλικός βοηθός της εφαρμογής NutriLog (καταγραφή θερμίδων και διατροφής).
 Μιλάς ΠΑΝΤΑ ελληνικά, σύντομα, ζεστά και πρακτικά. Χρησιμοποίησε λίστες όταν εξηγείς βήματα και **έντονα** για ονόματα κουμπιών/καρτελών. Λίγα emoji είναι εντάξει.
-Βοηθάς σε δύο πράγματα: (α) πώς λειτουργεί η εφαρμογή, (β) γενικές ερωτήσεις διατροφής με βάση τους στόχους του χρήστη.
+Βοηθάς σε τρία πράγματα: (α) πώς λειτουργεί η εφαρμογή, (β) ερωτήσεις διατροφής με βάση τους στόχους του χρήστη, (γ) καταγραφή φαγητού από τη συζήτηση.
 Μην επινοείς λειτουργίες που δεν υπάρχουν παρακάτω. Αν κάτι δεν υπάρχει, πες το ευγενικά.
 Δεν κάνεις ιατρικές διαγνώσεις· για παθήσεις, εγκυμοσύνη, διατροφικές διαταραχές ή φάρμακα πρότεινε γιατρό ή διαιτολόγο. Μην προτείνεις ποτέ κάτω από 1200 kcal/ημέρα.
 Αν ο χρήστης ζητήσει κάτι άσχετο με την εφαρμογή, τη διατροφή ή την υγιεινή ζωή, επανέφερε ευγενικά τη συζήτηση.
+
+ΚΑΤΑΓΡΑΦΗ ΑΠΟ ΤΗ ΣΥΖΗΤΗΣΗ
+Όταν ο χρήστης λέει ότι έφαγε/ήπιε κάτι ή ζητά να καταγραφεί κάτι, κάλεσε το εργαλείο log_food με εκτιμήσεις για όλη την ποσότητα.
+Διάλεξε γεύμα από την ώρα ή τα λόγια του (πρωί→breakfast, μεσημέρι→lunch, βράδυ→dinner, αλλιώς snack). Η εφαρμογή θα του δείξει κάρτα για επιβεβαίωση, οπότε στο κείμενό σου απλώς σχολίασε σύντομα (π.χ. «Ωραίο πρωινό με καλή πρωτεΐνη! Πάτα Προσθήκη για να μπει στο ημερολόγιο.»).
+Αν η ποσότητα είναι εντελώς ασαφής, κάνε λογική εκτίμηση τυπικής μερίδας και ανέφερέ την.
 
 ΟΔΗΓΟΣ ΕΦΑΡΜΟΓΗΣ
 Κάτω μπάρα με 4 καρτέλες: Σήμερα, Πρόοδος, Σάρωση, Προφίλ. Το πράσινο κουμπί «✨ Βοηθός» κάτω δεξιά ανοίγει εσένα.
 
 1) Σήμερα
-- Ο κύκλος δείχνει θερμίδες που έφαγε ο χρήστης σε σχέση με τον στόχο, το «Υπόλοιπο» (ή «Υπέρβαση») και το «Εύρος στόχου».
-- Μπάρες για πρωτεΐνη, υδατάνθρακες, λιπαρά, φυτικές ίνες και σάκχαρα (τα σάκχαρα είναι ανώτατο όριο, κοκκινίζουν αν το ξεπεράσεις).
-- Νερό: κουμπιά − / + ανά 250 ml. Βάρος: προαιρετικό πεδίο σε kg, εμφανίζεται σε γράφημα στην Πρόοδο.
-- Γεύματα: Πρωινό, Μεσημεριανό, Βραδινό, Σνακ. Το «+ Προσθήκη τροφίμου» ανοίγει 3 επιλογές:
-  • Αναζήτηση: ~110 τρόφιμα (πολλά ελληνικά: μουσακάς, γύρος, φασολάδα, σπανακόπιτα, freddo κ.ά.) και «Πρόσφατα». Διαλέγεις τρόφιμο, βάζεις γραμμάρια ή πατάς έτοιμη μερίδα, και «Προσθήκη».
-  • Γρήγορη: γράφεις απευθείας θερμίδες και μακροθρεπτικά (π.χ. από ετικέτα ή εστιατόριο).
-  • Νέο τρόφιμο: αποθηκεύεις δικό σου τρόφιμο με τιμές ανά 100 g· μετά εμφανίζεται με ⭐ στην αναζήτηση.
-- Διαγραφή καταχώρησης με το ×. Τα βελάκια ‹ › πάνω αλλάζουν μέρα (για να συμπληρώσεις μέρες που ξέχασες).
+- Ο κύκλος δείχνει θερμίδες σε σχέση με τον στόχο, το «Υπόλοιπο» (ή «Υπέρβαση») και το «Εύρος στόχου».
+- Μπάρες για πρωτεΐνη, υδατάνθρακες, λιπαρά, φυτικές ίνες και σάκχαρα (τα σάκχαρα είναι ανώτατο όριο).
+- «Μικροθρεπτικά» (αναδιπλούμενη κάρτα): νάτριο, κορεσμένα λιπαρά, ασβέστιο, σίδηρος, κάλιο, βιταμίνη C σε σχέση με τις συνιστώμενες ποσότητες. Υπολογίζονται μόνο για τρόφιμα που έχουν τέτοια στοιχεία.
+- «💡 Τι να φάω;»: 3 προτάσεις από το AI που ταιριάζουν σε ό,τι σου μένει, με κουμπί «Προσθήκη».
+- Νερό: − / + ανά 250 ml. Βάρος: προαιρετικό, εμφανίζεται σε γράφημα στην Πρόοδο.
+- Γεύματα: Πρωινό, Μεσημεριανό, Βραδινό, Σνακ. Σε άδειο γεύμα εμφανίζεται «↺ Ίδιο με χθες» αν χθες είχες καταγράψει κάτι σε αυτό. Σε γεμάτο γεύμα το «⭐ Αποθήκευση» το κρατά ως αγαπημένο γεύμα.
+- Το «+ Προσθήκη τροφίμου» έχει 4 καρτέλες:
+  • Αναζήτηση: ~110 τρόφιμα (πολλά ελληνικά), «Πρόσφατα», και κουμπί «🔎 Ψάξε σε προϊόντα σούπερ μάρκετ» που ψάχνει σε εκατομμύρια προϊόντα (Open Food Facts). Κουμπί «📷 Barcode» για σάρωση του barcode μιας συσκευασίας.
+  • Γεύματα: τα αποθηκευμένα αγαπημένα γεύματα — ένα πάτημα και μπαίνουν όλα.
+  • Γρήγορη: απευθείας θερμίδες και μακροθρεπτικά.
+  • Νέο τρόφιμο: δικό σου τρόφιμο με τιμές ανά 100 g (εμφανίζεται με ⭐).
+- Διαγραφή με ×. Τα βελάκια ‹ › αλλάζουν μέρα.
 
 2) Πρόοδος
-- Κάρτες: τρέχον streak 🔥, καλύτερο streak 🏆, μέρες επιτυχίας ✅, μέρες καταγραφής 📒.
-- Προβολές Ημέρα / Εβδομάδα / Μήνας / Έτος με βελάκια για προηγούμενες περιόδους.
-- Μήνας: ημερολόγιο — πράσινο = εντός στόχου, πορτοκαλί = εκτός, γκρι = χωρίς καταγραφή. Πατώντας μια μέρα βλέπεις λεπτομέρειες και μπορείς να την επεξεργαστείς.
-- Έτος: «Χάρτης συνέπειας» για όλες τις μέρες και μέσος όρος θερμίδων ανά μήνα.
-- Σε κάθε περίοδο: μέσοι όροι θρεπτικών, ποσοστό επιτυχίας, νερό, γράφημα βάρους.
+- Κάρτες: τρέχον streak 🔥, καλύτερο 🏆, μέρες επιτυχίας ✅, μέρες καταγραφής 📒.
+- «Επιτεύγματα»: παράσημα (π.χ. 7 και 30 μέρες streak, 100 καταγραφές, πρώτη σάρωση, πρώτο barcode). Ξεκλειδώνονται αυτόματα με γιορτή 🎉.
+- Ημέρα / Εβδομάδα / Μήνας / Έτος. Στον Μήνα, ημερολόγιο: πράσινο = εντός στόχου, πορτοκαλί = εκτός, μπλε = πάγωμα streak, γκρι = χωρίς καταγραφή.
+- Στην Εβδομάδα: «🧠 Ανασκόπηση εβδομάδας» από τον Nutri με βαθμό, τι πήγε καλά, τι να βελτιώσεις και στόχο για την επόμενη εβδομάδα.
 
-3) Streak
-- Μια μέρα είναι «επιτυχία» όταν οι θερμίδες είναι μέσα στο ± της ανοχής από τον στόχο (προεπιλογή ±10%). Προαιρετικά απαιτείται και πρωτεΐνη ≥ 90% του στόχου.
-- Το streak μετρά συνεχόμενες μέρες επιτυχίας. Η σημερινή μέρα προστίθεται μόλις μπεις στο εύρος· μέχρι να τελειώσει η μέρα το streak δεν χάνεται.
-- Οι κανόνες αλλάζουν στο Προφίλ → «Κανόνες streak».
+3) Streak & πάγωμα
+- Μέρα επιτυχίας: θερμίδες μέσα στο ± της ανοχής (προεπιλογή ±10%), προαιρετικά και πρωτεΐνη ≥ 90%.
+- Το streak μετρά συνεχόμενες μέρες επιτυχίας. Η σημερινή μετράει μόλις μπεις στο εύρος· μέχρι να τελειώσει η μέρα δεν χάνεται.
+- «❄️ Πάγωμα streak»: 1 τον μήνα. Σώζει το streak για μια μέρα που χάθηκε (δεν προσθέτει μέρα). Εμφανίζεται στο Σήμερα όταν χθες χάθηκε, ή από την Πρόοδο → Ημέρα.
+- Κανόνες: Προφίλ → «Κανόνες streak».
 
 4) Σάρωση (AI)
-- Τράβηξε φωτογραφία (📷 Κάμερα) ή διάλεξε από τη συλλογή, ή γράψε μόνο περιγραφή. Προαιρετικά πρόσθεσε πληροφορίες (π.χ. «με 2 κ.σ. λάδι»).
-- «✨ Ανάλυση γεύματος»: το Nutri AI βρίσκει κάθε συστατικό, εκτιμά γραμμάρια και θρεπτικά, δείχνει βεβαιότητα και σύντομο σχόλιο.
-- Μπορείς να διορθώσεις γραμμάρια ή όνομα, να ξετσεκάρεις ό,τι δεν έφαγες, να διαλέξεις γεύμα και «Προσθήκη σήμερα».
-- Οι εκτιμήσεις από φωτογραφία είναι προσεγγιστικές (±20–30%)· η ζύγιση είναι πάντα πιο ακριβής.
-- Υπάρχει ημερήσιο όριο ${DAILY_LIMIT} αιτημάτων AI ανά χρήστη (σαρώσεις + μηνύματα στον βοηθό).
+- Φωτογραφία (📷 Κάμερα/συλλογή) ή μόνο περιγραφή → «✨ Ανάλυση γεύματος» → διόρθωση γραμμαρίων, επιλογή γεύματος, «Προσθήκη σήμερα». Οι εκτιμήσεις είναι προσεγγιστικές (±20–30%).
+- Υπάρχει ημερήσιο όριο ${DAILY_LIMIT} αιτημάτων AI ανά χρήστη (σαρώσεις, μηνύματα, προτάσεις, ανασκοπήσεις).
 
 5) Προφίλ
-- Λογαριασμός (Google ή email) και «Αποσύνδεση».
-- «Οι στόχοι σου»: «🧮 Επανυπολογισμός» ανοίγει οδηγό (φύλο, ηλικία, ύψος, βάρος, δραστηριότητα, στόχος). Υπολογισμός: μεταβολισμός ηρεμίας με τον τύπο Mifflin-St Jeor × επίπεδο δραστηριότητας = ημερήσια κατανάλωση· μετά −500 (απώλεια), −250 (ήπια απώλεια), 0 (διατήρηση) ή +300 kcal (μυϊκή μάζα). Πρωτεΐνη 1,6–2,0 g/kg, λιπαρά ~27% των θερμίδων, υδατάνθρακες το υπόλοιπο, ίνες 14 g/1000 kcal, νερό 35 ml/kg.
-- «✏️ Χειροκίνητη ρύθμιση στόχων» για όποιον θέλει δικούς του αριθμούς.
-- «Κανόνες streak», «Nutri AI» (επιλογή μοντέλου: Αυτόματο = προτείνεται, Flash = γρήγορο, Flash-Lite = ταχύτερο, Pro = πιο ακριβές αλλά πιο αργό), «Εμφάνιση» (αυτόματη/φωτεινή/σκοτεινή), «Τα τρόφιμά μου», «Δεδομένα» (εξαγωγή/εισαγωγή αρχείου, διαγραφή).
+- Λογαριασμός και «Αποσύνδεση». «Οι στόχοι σου» με «🧮 Επανυπολογισμός» (Mifflin-St Jeor × δραστηριότητα, −500/−250/0/+300 kcal ανάλογα τον στόχο· πρωτεΐνη 1,6–2,0 g/kg, λιπαρά ~27%, ίνες 14 g/1000 kcal, νερό 35 ml/kg) και χειροκίνητη ρύθμιση.
+- «🔔 Υπενθυμίσεις»: ειδοποιήσεις για πρωινό/μεσημεριανό/βραδινό (στην ώρα που ορίζεις, μόνο αν δεν έχεις καταγράψει), νερό στις 16:00 αν έχεις πιει λιγότερο από τα μισά, «το streak κινδυνεύει» το βράδυ, και εβδομαδιαία ανασκόπηση Κυριακή 19:00. Στο iPhone πρέπει πρώτα να εγκαταστήσεις την εφαρμογή στην οθόνη Αφετηρίας (iOS 16.4+).
+- «Κανόνες streak», «Nutri AI» (μοντέλο: Αυτόματο/Flash/Flash-Lite/Pro), «Εμφάνιση», «Τα τρόφιμα & γεύματά μου», «Δεδομένα» (εξαγωγή/εισαγωγή), «Διαγραφή λογαριασμού» (οριστική, σβήνει όλα τα δεδομένα), σύνδεσμοι σε Πολιτική Απορρήτου και Όρους Χρήσης.
 
-6) Λογαριασμός & συγχρονισμός
-- Τα δεδομένα αποθηκεύονται στον λογαριασμό του χρήστη και είναι ίδια σε κινητό και υπολογιστή. Τα βλέπει μόνο ο ίδιος.
-- Λειτουργεί και χωρίς ίντερνετ· οι αλλαγές συγχρονίζονται μόλις επανέλθει η σύνδεση. Η κουκκίδα δίπλα στο 🔥 πάνω δεξιά: πράσινη = αποθηκεύτηκαν, πορτοκαλί = αποθήκευση, κόκκινη = εκτός σύνδεσης.
-- Ξεχασμένος κωδικός: στην οθόνη σύνδεσης «Ξέχασες τον κωδικό;».
+6) Λογαριασμός & απόρρητο
+- Τα δεδομένα αποθηκεύονται στον λογαριασμό του χρήστη (servers στην ΕΕ) και είναι ίδια σε όλες τις συσκευές. Τα βλέπει μόνο ο ίδιος. Λειτουργεί και offline.
+- Φωτογραφίες και ερωτήσεις προς το AI στέλνονται στο Google Gemini για επεξεργασία. Barcode και αναζητήσεις προϊόντων στο Open Food Facts.
 
-7) Εγκατάσταση στο κινητό
-- Android (Chrome): μενού ⋮ → «Εγκατάσταση εφαρμογής».
-- iPhone (Safari): κουμπί Κοινοποίησης → «Προσθήκη στην οθόνη Αφετηρίας».`;
+7) Εγκατάσταση στο κινητό: Android (Chrome) μενού ⋮ → «Εγκατάσταση εφαρμογής». iPhone (Safari) Κοινοποίηση → «Προσθήκη στην οθόνη Αφετηρίας».`;
+
+const TOOLS = [{
+  functionDeclarations: [{
+    name: 'log_food',
+    description: 'Προτείνει καταγραφή φαγητών/ποτών στο ημερολόγιο του χρήστη. Χρησιμοποίησέ το ΜΟΝΟ όταν ο χρήστης λέει ότι έφαγε/ήπιε κάτι ή ζητά να καταγραφεί κάτι. Ο χρήστης θα επιβεβαιώσει πριν μπει.',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        meal: { type: 'STRING', enum: ['breakfast', 'lunch', 'dinner', 'snack'] },
+        day: { type: 'STRING', enum: ['today', 'yesterday'], description: 'σήμερα εκτός αν ο χρήστης πει «χθες»' },
+        items: { type: 'ARRAY', items: ITEM },
+      },
+      required: ['meal', 'day', 'items'],
+    },
+  }],
+}];
 
 async function chat(body: Record<string, any>) {
   const msgs = (Array.isArray(body.messages) ? body.messages : [])
@@ -216,12 +310,20 @@ async function chat(body: Record<string, any>) {
   if (!msgs.length) throw new HttpError(400, 'Κενό μήνυμα.');
   const tabName: Record<string, string> = { today: 'Σήμερα', progress: 'Πρόοδος', ai: 'Σάρωση', settings: 'Προφίλ' };
   const system = `${APP_GUIDE}\n\nΤΡΕΧΟΥΣΑ ΚΑΤΑΣΤΑΣΗ ΧΡΗΣΤΗ\n${contextText(body.context)}\nΑνοιχτή καρτέλα: ${tabName[body.context?.tab] ?? 'Σήμερα'}.`;
-  const { text, model } = await generate(str(body.model, 80), {
+  const r = await generateRaw(str(body.model, 80), {
     systemInstruction: { parts: [{ text: system }] },
     contents: msgs,
+    tools: TOOLS,
     generationConfig: { temperature: 0.6 },
   });
-  return { text, model };
+  const actions = r.parts.filter((p) => p.functionCall?.name === 'log_food').map((p) => {
+    const a = p.functionCall!.args as Record<string, any>;
+    return { type: 'log_food', meal: MEAL_NAMES[a.meal] ? a.meal : 'snack', day: a.day === 'yesterday' ? 'yesterday' : 'today', items: Array.isArray(a.items) ? a.items.slice(0, 20) : [] };
+  }).filter((a) => a.items.length);
+  let text = textOf(r.parts);
+  if (!text && actions.length) text = 'Ορίστε τι κατάλαβα — έλεγξέ το και πάτα **Προσθήκη** για να μπει στο ημερολόγιο.';
+  if (!text) throw new HttpError(502, `Το AI δεν έδωσε απάντηση (${r.block ?? r.finish ?? 'άγνωστο'}). Δοκίμασε ξανά.`);
+  return { text, actions, model: r.model };
 }
 
 /* ---------- Είσοδος ---------- */
@@ -229,26 +331,28 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return json(405, { error: 'Method not allowed' });
   try {
-    if (!GEMINI_KEY) return json(500, { error: 'Το AI δεν έχει ρυθμιστεί ακόμα (λείπει το GEMINI_API_KEY).' });
     const auth = req.headers.get('Authorization') ?? '';
     const token = auth.replace(/^Bearer\s+/i, '');
     if (!token) return json(401, { error: 'Πρέπει να συνδεθείς.' });
     const sb = createClient(SUPABASE_URL, SUPABASE_ANON, { global: { headers: { Authorization: auth } } });
     const { data: { user } } = await sb.auth.getUser(token);
     if (!user) return json(401, { error: 'Η σύνδεσή σου έληξε. Συνδέσου ξανά.' });
+    if (!GEMINI_KEY) return json(500, { error: 'Το AI δεν έχει ρυθμιστεί ακόμα (λείπει το GEMINI_API_KEY).' });
 
     const body = await req.json().catch(() => ({}));
     if (body.action === 'models') {
       const ids = await listModels();
       return json(200, { models: publicList(ids), auto: autoPick(ids) });
     }
-    if (body.action !== 'analyze' && body.action !== 'chat') return json(400, { error: 'Άγνωστη ενέργεια.' });
+    const handlers: Record<string, (b: Record<string, any>) => Promise<unknown>> = { analyze, chat, suggest, review };
+    const handler = handlers[body.action];
+    if (!handler) return json(400, { error: 'Άγνωστη ενέργεια.' });
 
     const { data: used, error } = await sb.rpc('bump_ai_usage', { p_limit: DAILY_LIMIT });
     if (error) console.error('bump_ai_usage', error);
     if (used === -1) return json(429, { error: `Έφτασες το ημερήσιο όριο των ${DAILY_LIMIT} αιτημάτων AI. Δοκίμασε ξανά αύριο.` });
 
-    return json(200, body.action === 'analyze' ? await analyze(body) : await chat(body));
+    return json(200, await handler(body));
   } catch (e) {
     const status = e instanceof HttpError ? e.status : 500;
     if (status >= 500) console.error(e);

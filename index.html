@@ -352,6 +352,11 @@ dialog.tall .sheet-in{height:min(720px,calc(100dvh - 30px))}
 a{color:var(--accent-text)}
 
 /* profile */
+.av-edit{position:relative;overflow:visible}
+.av-edit img{border-radius:50%}
+.av-edit i{position:absolute;right:-3px;bottom:-3px;width:26px;height:26px;border-radius:50%;background:var(--card);box-shadow:var(--shadow);font-size:13px;display:grid;place-items:center;font-style:normal}
+.pe-av{width:104px;height:104px;border-radius:50%;margin:4px auto 12px;overflow:hidden;background:var(--accent-soft);color:var(--accent-text);display:grid;place-items:center;font-size:40px;font-weight:800;box-shadow:0 0 0 4px var(--card),0 0 0 6px var(--accent-soft),var(--shadow)}
+.pe-av img{width:100%;height:100%;object-fit:cover;display:block}
 .acct{display:flex;align-items:center;gap:14px}
 .acct .avatar{width:62px;height:62px;font-size:24px;cursor:default}
 .goal-hero{display:flex;align-items:baseline;gap:6px}
@@ -509,6 +514,8 @@ canvas.confetti{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:n
 <dialog class="sheet" id="wizDlg"><div class="sheet-in" id="wizIn"></div></dialog>
 <dialog class="sheet" id="sugDlg"><div class="sheet-in" id="sugIn"></div></dialog>
 <dialog class="sheet" id="consentDlg"><div class="sheet-in" id="consentIn"></div></dialog>
+<dialog class="sheet" id="profDlg"><div class="sheet-in" id="profIn"></div></dialog>
+<input type="file" id="fileAvatar" accept="image/*" hidden>
 <dialog class="sheet tall" id="chatDlg"><div class="sheet-in">
   <div class="sheet-head">
     <div class="bot-h"><span class="bot-av">✨</span><div><h3>Nutri</h3><small class="muted">Ο βοηθός σου στο NutriLog</small></div></div>
@@ -681,7 +688,7 @@ const sb=(CFG.supabaseUrl&&CFG.supabaseAnonKey&&window.supabase)?window.supabase
 /* ---------- Κατάσταση ---------- */
 const DEF_REM={enabled:false,breakfast:'09:00',breakfastOn:true,lunch:'14:00',lunchOn:true,dinner:'20:30',dinnerOn:true,water:true,streak:true,streakTime:'21:30',weekly:true};
 function defState(){return{
-  profile:{name:'',sex:'m',age:25,height:175,weight:75,activity:1.55,goal:'maintain'},
+  profile:{name:'',sex:'m',age:25,height:175,weight:75,activity:1.55,goal:'maintain',targetWeight:null,avatar:''},
   goals:{kcal:2200,protein:130,carbs:250,fat:70,fiber:30,sugar:55,water:2500},
   settings:{model:'',tolerance:10,requireProtein:false,theme:'auto',reminders:{...DEF_REM}},
   customFoods:[],savedMeals:[],days:{},freezes:{},reviews:{},achSeen:null,celebrated:'',consent:null,onboarded:false,updatedAt:0
@@ -732,7 +739,7 @@ function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show'
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 function displayName(){const m=(user&&user.user_metadata)||{};return S.profile.name||m.full_name||m.name||(user&&user.email?user.email.split('@')[0]:'φίλε')}
 const firstName=()=>displayName().split(' ')[0];
-function avatarHtml(){const m=(user&&user.user_metadata)||{},url=m.avatar_url||m.picture;
+function avatarHtml(){const m=(user&&user.user_metadata)||{},url=S.profile.avatar||m.avatar_url||m.picture;
   return url?`<img src="${esc(url)}" alt="" referrerpolicy="no-referrer">`:esc(displayName().charAt(0).toUpperCase())}
 function greeting(){const h=new Date().getHours();return h<5?'Καλό βράδυ':h<13?'Καλημέρα':h<20?'Καλησπέρα':'Καλό βράδυ'}
 function applyTheme(t){if(!t||t==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.dataset.theme=t}
@@ -1097,7 +1104,7 @@ async function startApp(){
   if(S.settings.reminders.enabled)ensurePushSub(false).catch(()=>{});
 }
 function onSignedOut(){stopScanner();user=null;appUid=null;S=defState();chat.msgs=[];models={list:null,auto:'',loading:false,err:''};
-  ['#dlg','#wizDlg','#chatDlg','#sugDlg','#consentDlg'].forEach(s=>{const d=$(s);if(d.open)d.close()});applyTheme('auto');renderAuth('signin')}
+  ['#dlg','#wizDlg','#chatDlg','#sugDlg','#consentDlg','#profDlg'].forEach(s=>{const d=$(s);if(d.open)d.close()});applyTheme('auto');renderAuth('signin')}
 
 /* ---------- Render ---------- */
 function render(){
@@ -1167,7 +1174,7 @@ function renderToday(){
     </div>
     <div class="card"><h3>⚖️ Βάρος</h3>
       <div class="row"><input type="number" step="0.1" min="20" max="400" inputmode="decimal" placeholder="π.χ. 74,5" value="${d.weight??''}" data-weight="${k}"><span class="muted">kg</span></div>
-      <div class="small muted" style="margin-top:8px">Προαιρετικό — εμφανίζεται στο γράφημα προόδου.</div>
+      <div class="small muted" style="margin-top:8px">${+S.profile.targetWeight>0?`🎯 Στόχος: ${String(S.profile.targetWeight).replace('.',',')} kg`:'Προαιρετικό — εμφανίζεται στο γράφημα προόδου.'}</div>
     </div>
   </section>`;
   const yd=S.days[dk(addDays(curDate,-1))]||{};
@@ -1224,7 +1231,10 @@ function weightCard(keys){
   const pts=keys.filter(k=>S.days[k]&&S.days[k].weight).map(k=>({t:pk(k).getTime(),v:+S.days[k].weight,l:fmtDate(pk(k),{day:'numeric',month:'short'})}));
   let diff='';
   if(pts.length>=2){const d=r1(pts[pts.length-1].v-pts[0].v);diff=`<span class="badge ${d<=0?'hit':'miss'}" style="float:right">${d>0?'+':''}${String(d).replace('.',',')} kg</span>`}
-  return`<section class="card"><h3>⚖️ Βάρος ${diff}</h3>${lineChart(pts)}</section>`;
+  const tw=+S.profile.targetWeight;let tgt='';
+  if(tw>0){const cur=pts.length?pts[pts.length-1].v:+S.profile.weight,rem=r1(Math.abs(cur-tw)),f=v=>String(v).replace('.',',');
+    tgt=`<div class="info">🎯 Στόχος βάρους <b>${f(tw)} kg</b> · ${rem<0.1?'τον έπιασες! 🎉':`απομένουν <b>${f(rem)} kg</b>`}</div>`}
+  return`<section class="card"><h3>⚖️ Βάρος ${diff}</h3>${lineChart(pts)}${tgt}</section>`;
 }
 function avgBlock(keys,title){
   const lk=keys.filter(hasE),hits=keys.filter(k=>status(k)==='hit').length;
@@ -1452,11 +1462,11 @@ function renderSettings(){
   if(!models.list&&!models.loading&&!models.err)setTimeout(loadModels,0);
   const num=(path,val,step=1)=>`<input type="number" step="${step}" min="0" inputmode="decimal" value="${val}" data-set="${path}">`;
   const gchip=(c,l,v)=>`<span class="gchip"><i style="background:${c}"></i>${l} ${v}</span>`;
-  return`<section class="card"><div class="acct"><span class="avatar">${avatarHtml()}</span>
-      <div style="flex:1;min-width:0"><b style="font-size:18px">${esc(displayName())}</b><div class="small muted" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(user.email||'')}</div>
+  return`<section class="card"><div class="acct"><button class="avatar av-edit" data-act="editProfile" aria-label="Αλλαγή φωτογραφίας προφίλ">${avatarHtml()}<i>📷</i></button>
+      <div style="flex:1;min-width:0"><b style="font-size:19px;letter-spacing:-.02em">${esc(displayName())}</b><div class="small muted" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(user.email||'')}</div>
       <span class="badge none" style="margin-top:6px">${prov==='google'?'Σύνδεση με Google':'Σύνδεση με email'}</span></div></div>
-    <div class="info" id="syncLine">${syncText()}</div>
-    <button class="btn block" style="margin-top:12px" data-act="logout">Αποσύνδεση</button></section>
+    <div class="row" style="margin-top:14px"><button class="btn primary" style="flex:1" data-act="editProfile">✏️ Επεξεργασία προφίλ</button><button class="btn" data-act="logout">Αποσύνδεση</button></div>
+    <div class="info" id="syncLine">${syncText()}</div></section>
 
   <section class="card"><div class="meal-head"><h3 style="white-space:nowrap">🎯 Οι στόχοι σου</h3><button class="chip" data-act="wizard">🧮 Επανυπολογισμός</button></div>
     <div class="goal-hero"><b>${r0(g.kcal)}</b><span class="muted">kcal / ημέρα</span></div>
@@ -1506,6 +1516,96 @@ function renderSettings(){
     <button class="btn danger block" data-act="deleteAccount">Διαγραφή λογαριασμού</button></section>
   <div class="legal"><a href="privacy.html">Πολιτική Απορρήτου</a><a href="terms.html">Όροι Χρήσης</a></div>
   <p class="small muted" style="text-align:center;margin-top:0">NutriLog · έκδοση 4 · Δεδομένα προϊόντων: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a> (ODbL)</p>`;
+}
+
+/* ---------- Επεξεργασία προφίλ ---------- */
+let pe=null;
+const hasOwnAvatar=()=>!!S.profile.avatar;
+function openProfile(){pe={p:{...S.profile,name:S.profile.name||displayName()},blob:null,preview:'',remove:false,recalc:true,busy:false};renderProfile();$('#profDlg').showModal()}
+function renderProfile(){
+  const p=pe.p,prov=(user.app_metadata&&user.app_metadata.provider)||'email';
+  const m=(user&&user.user_metadata)||{},cur=pe.preview||(pe.remove?'':S.profile.avatar)||m.avatar_url||m.picture||'';
+  const own=pe.preview||(!pe.remove&&hasOwnAvatar());
+  const sel=(f,opts)=>`<select data-pe="${f}">${opts.map(([v,l])=>`<option value="${v}" ${String(p[f])===String(v)?'selected':''}>${l}</option>`).join('')}</select>`;
+  const numIn=(f,stp,ph)=>`<input type="number" inputmode="decimal" step="${stp}" data-pe="${f}" value="${p[f]??''}" ${ph?`placeholder="${ph}"`:''}>`;
+  $('#profIn').innerHTML=`<div class="sheet-head"><h3>Επεξεργασία προφίλ</h3><button class="icon-btn" data-act="closeProfile" aria-label="Κλείσιμο">✕</button></div>
+  <div class="sheet-scroll">
+    <div class="pe-av">${cur?`<img src="${esc(cur)}" alt="" referrerpolicy="no-referrer">`:esc((p.name||displayName()).charAt(0).toUpperCase())}</div>
+    <div class="row" style="justify-content:center;flex-wrap:wrap"><button class="btn sm" data-act="pePhoto">📷 ${cur?'Αλλαγή φωτογραφίας':'Προσθήκη φωτογραφίας'}</button>${own?`<button class="btn sm danger" data-act="peRemovePhoto">Αφαίρεση</button>`:''}</div>
+    ${!own&&(m.avatar_url||m.picture)?'<div class="small muted" style="text-align:center;margin-top:6px">Τώρα εμφανίζεται η φωτογραφία του λογαριασμού Google σου.</div>':''}
+    <label class="f">Όνομα</label><input type="text" data-pe="name" value="${esc(p.name)}" maxlength="40" placeholder="Πώς να σε λέμε;" autocomplete="given-name">
+    <label class="f">Φύλο</label><div class="seg" style="margin:0">${[['m','👨 Άνδρας'],['f','👩 Γυναίκα']].map(([v,l])=>`<button class="${p.sex===v?'on':''}" data-act="peSet" data-f="sex" data-v="${v}">${l}</button>`).join('')}</div>
+    <div class="form3">
+      <div><label class="f">Ηλικία</label>${numIn('age',1)}</div>
+      <div><label class="f">Ύψος (cm)</label>${numIn('height',1)}</div>
+      <div><label class="f">Βάρος (kg)</label>${numIn('weight',0.1)}</div>
+    </div>
+    <label class="f">Στόχος βάρους (kg, προαιρετικό)</label>${numIn('targetWeight',0.1,'π.χ. 70')}
+    <div class="form2">
+      <div><label class="f">Δραστηριότητα</label>${sel('activity',ACTIVITY.map(a=>[a[0],a[2]]))}</div>
+      <div><label class="f">Στόχος</label>${sel('goal',GOALS.map(x=>[x[0],x[2]]))}</div>
+    </div>
+    <label class="consent"><input type="checkbox" data-pe-recalc ${pe.recalc?'checked':''}><span>Ενημέρωση των ημερήσιων στόχων (θερμίδες, πρωτεΐνη κ.λπ.) με βάση τα νέα στοιχεία</span></label>
+    <button class="btn primary block lg" style="margin-top:14px" data-act="saveProfile" ${pe.busy?'disabled':''}>${pe.busy?'Αποθήκευση…':'Αποθήκευση'}</button>
+    ${prov==='email'&&!DEMO?`<details class="acc"><summary>🔑 Αλλαγή κωδικού</summary>
+      <label class="f">Νέος κωδικός</label><div class="pw"><input type="password" id="pe_pw" autocomplete="new-password" minlength="6" placeholder="Τουλάχιστον 6 χαρακτήρες"><button type="button" data-act="pwToggle" aria-label="Εμφάνιση κωδικού">👁</button></div>
+      <label class="f">Επιβεβαίωση κωδικού</label><input type="password" id="pe_pw2" autocomplete="new-password">
+      <button class="btn block" style="margin-top:12px" data-act="changePw">Αλλαγή κωδικού</button></details>`:''}
+  </div>`;
+}
+function processAvatar(file){
+  if(!file||!pe)return;
+  if(!file.type.startsWith('image/')){toast('Διάλεξε αρχείο εικόνας');return}
+  const url=URL.createObjectURL(file),img=new Image();
+  img.onload=()=>{
+    const s=Math.min(img.width,img.height),O=320,c=document.createElement('canvas');c.width=c.height=O;
+    c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,O,O); // κεντρικό τετράγωνο
+    URL.revokeObjectURL(url);
+    pe.preview=c.toDataURL('image/jpeg',0.86);pe.remove=false;
+    const bin=atob(pe.preview.split(',')[1]);pe.blob=new Blob([Uint8Array.from(bin,ch=>ch.charCodeAt(0))],{type:'image/jpeg'});
+    renderProfile();
+  };
+  img.onerror=()=>{URL.revokeObjectURL(url);toast('Δεν ήταν δυνατή η ανάγνωση της εικόνας')};
+  img.src=url;
+}
+async function saveProfile(){
+  const p=pe.p,old=S.profile;
+  p.name=String(p.name||'').trim().slice(0,40);
+  if(!(p.age>=16&&p.age<=100)){toast('Η ηλικία πρέπει να είναι 16–100.');return}
+  if(!(p.height>=120&&p.height<=230)){toast('Το ύψος πρέπει να είναι 120–230 cm.');return}
+  if(!(p.weight>=30&&p.weight<=300)){toast('Το βάρος πρέπει να είναι 30–300 kg.');return}
+  if(p.targetWeight!=null&&p.targetWeight!==''&&!(p.targetWeight>=30&&p.targetWeight<=300)){toast('Ο στόχος βάρους πρέπει να είναι 30–300 kg.');return}
+  if(!(p.targetWeight>0))p.targetWeight=null;
+  pe.busy=true;renderProfile();
+  try{
+    const path=`${user.id}/avatar.jpg`;
+    if(pe.blob){
+      if(DEMO)p.avatar=pe.preview;
+      else{
+        const {error}=await sb.storage.from('avatars').upload(path,pe.blob,{upsert:true,contentType:'image/jpeg',cacheControl:'3600'});
+        if(error)throw new Error('Το ανέβασμα της φωτογραφίας απέτυχε. Δοκίμασε ξανά.');
+        p.avatar=sb.storage.from('avatars').getPublicUrl(path).data.publicUrl+'?v='+Date.now();
+      }
+    }else if(pe.remove){
+      if(!DEMO)await sb.storage.from('avatars').remove([path]);
+      p.avatar='';
+    }
+    const bodyChanged=['sex','age','height','weight','activity','goal'].some(k=>String(p[k])!==String(old[k]));
+    S.profile={...p,activity:+p.activity};
+    if(+p.weight!==+old.weight)dayObj(todayK()).weight=r1(+p.weight);
+    const recalc=pe.recalc&&bodyChanged;
+    if(recalc)S.goals=calcGoals(S.profile).goals;
+    save();$('#profDlg').close();pe=null;render();
+    toast('✓ Το προφίλ αποθηκεύτηκε'+(recalc?' · οι στόχοι ενημερώθηκαν':''));
+  }catch(e){pe.busy=false;renderProfile();toast('⚠️ '+(e.message||'Κάτι πήγε στραβά'))}
+}
+async function changePw(){
+  const a=$('#pe_pw').value,b=$('#pe_pw2').value;
+  if(a.length<6){toast('Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.');return}
+  if(a!==b){toast('Οι δύο κωδικοί δεν ταιριάζουν.');return}
+  const {error}=await sb.auth.updateUser({password:a});
+  if(error){toast('⚠️ '+(/reauth/i.test(error.message)?'Για λόγους ασφαλείας αποσυνδέσου, συνδέσου ξανά και δοκίμασε πάλι.':authErr(error)));return}
+  $('#pe_pw').value=$('#pe_pw2').value='';toast('🔑 Ο κωδικός άλλαξε');
 }
 
 /* ---------- Οδηγός ρύθμισης στόχων ---------- */
@@ -1776,6 +1876,13 @@ const A={
   google:async()=>{authMsg=null;const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:APP_URL}});if(error){authMsg=['bad',authErr(error)];renderAuth()}},
   authView:el=>{authMsg=null;renderAuth(el.dataset.v)},
   pwToggle:el=>{const i=el.parentElement.querySelector('input');i.type=i.type==='password'?'text':'password'},
+  editProfile:openProfile,
+  closeProfile:()=>{$('#profDlg').close();pe=null},
+  pePhoto:()=>$('#fileAvatar').click(),
+  peRemovePhoto:()=>{pe.blob=null;pe.preview='';pe.remove=true;renderProfile()},
+  peSet:el=>{pe.p[el.dataset.f]=el.dataset.v;renderProfile()},
+  saveProfile,
+  changePw,
   consentOk:()=>{if(!$('#consentChk').checked){toast('Τσέκαρε το κουτάκι για να συνεχίσεις');return}giveConsent();save();$('#consentDlg').close();setTimeout(checkCelebrations,400)},
   // οδηγός
   wizard:()=>openWizard(false),
@@ -1804,7 +1911,7 @@ document.addEventListener('click',e=>{
   const el=e.target.closest('[data-act]');if(!el||el.disabled)return;
   const f=A[el.dataset.act];if(f){e.preventDefault();f(el,e)}
 });
-['#dlg','#chatDlg','#sugDlg'].forEach(s=>$(s).addEventListener('click',e=>{if(e.target===$(s)){if(s==='#dlg')closeAdd();else $(s).close()}}));
+['#dlg','#chatDlg','#sugDlg','#profDlg'].forEach(s=>$(s).addEventListener('click',e=>{if(e.target===$(s)){if(s==='#dlg')closeAdd();else $(s).close()}}));
 $('#dlg').addEventListener('close',stopScanner);
 $('#wizDlg').addEventListener('cancel',e=>{if(wiz&&wiz.first){e.preventDefault();return}wiz=null});
 $('#consentDlg').addEventListener('cancel',e=>e.preventDefault());
@@ -1820,6 +1927,7 @@ document.addEventListener('input',e=>{
   else if(el.dataset.input==='grams'){add.grams=parseFloat(el.value)||0;$('#selPrev').innerHTML=selPrev()}
   else if(el.dataset.input==='aidesc')ai.desc=el.value;
   else if(el.dataset.ainame!==undefined&&ai.result)ai.result.items[+el.dataset.ainame].name=el.value;
+  else if(el.dataset.pe&&pe&&el.tagName==='INPUT'){const f=el.dataset.pe;pe.p[f]=f==='name'?el.value:(el.value===''?null:parseFloat(el.value))}
   else if(el.dataset.wiz&&wiz){const f=el.dataset.wiz;wiz.p[f]=f==='name'?el.value:parseFloat(el.value)}
   else if(el.dataset.set==='settings.tolerance'){const t=+el.value;$('#tolVal').textContent=`±${t}%`;$('#tolRange').textContent=`Δηλαδή ${r0(S.goals.kcal*(1-t/100))}–${r0(S.goals.kcal*(1+t/100))} kcal την ημέρα`}
 });
@@ -1845,7 +1953,7 @@ document.addEventListener('change',async e=>{
   }
   if(el.dataset.rem){const r=S.settings.reminders,k=el.dataset.rem;r[k]=el.type==='checkbox'?el.checked:el.value;save();syncRemPrefs();
     if(el.type==='checkbox'){const y=window.scrollY;render();window.scrollTo(0,y)}return}
-  if(el.dataset.weight){const v=parseFloat(String(el.value).replace(',','.'));const d=dayObj(el.dataset.weight);if(isNaN(v))delete d.weight;else d.weight=r1(v);save();toast('Το βάρος αποθηκεύτηκε');return}
+  if(el.dataset.weight){const v=parseFloat(String(el.value).replace(',','.'));const d=dayObj(el.dataset.weight);if(isNaN(v))delete d.weight;else{d.weight=r1(v);if(el.dataset.weight===todayK()&&v>=30&&v<=300)S.profile.weight=r1(v)}save();toast('Το βάρος αποθηκεύτηκε');return}
   if(el.dataset.wizagree!==undefined&&wiz){wiz.agree=el.checked;return}
   if(el.dataset.actmeal){const [mi,ai_]=el.dataset.actmeal.split(':').map(Number);const a=chat.msgs[mi]&&chat.msgs[mi].actions[ai_];if(a){a.meal=el.value;saveChat()}return}
   if(el.id==='mealSel'){add.meal=el.value;return}
@@ -1853,6 +1961,9 @@ document.addEventListener('change',async e=>{
   if(el.dataset.aion!==undefined&&ai.result){ai.result.items[+el.dataset.aion].on=el.checked;render();return}
   if(el.dataset.aigrams!==undefined&&ai.result){ai.result.items[+el.dataset.aigrams].grams=Math.max(0,parseFloat(el.value)||0);const y=window.scrollY;render();window.scrollTo(0,y);return}
   if(el.id==='fileCam'||el.id==='fileGal'){loadImage(el.files[0]);el.value='';return}
+  if(el.id==='fileAvatar'){processAvatar(el.files[0]);el.value='';return}
+  if(el.dataset.pe&&pe&&el.tagName==='SELECT'){pe.p[el.dataset.pe]=el.value;return}
+  if(el.dataset.peRecalc!==undefined&&pe){pe.recalc=el.checked;return}
   if(el.id==='fileBarcode'){const file=el.files[0];el.value='';if(!file)return;
     try{await loadScript(QR_LIB);stopScanner();const tmp=new window.Html5Qrcode('reader',false);const code=await tmp.scanFile(file,false);tmp.clear();onBarcode(code)}
     catch(err){toast('Δεν βρέθηκε barcode στη φωτογραφία. Δοκίμασε πιο καθαρή λήψη.')}return}

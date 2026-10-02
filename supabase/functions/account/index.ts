@@ -1,6 +1,7 @@
 // NutriLog — Edge Function "account"
 // Οριστική διαγραφή του λογαριασμού του συνδεδεμένου χρήστη. Τα δεδομένα του
-// (user_data, ai_usage, push_subscriptions) σβήνονται αυτόματα μέσω ON DELETE CASCADE.
+// (user_data, ai_usage, push_subscriptions) σβήνονται αυτόματα μέσω ON DELETE CASCADE·
+// η φωτογραφία προφίλ (Storage, bucket "avatars") σβήνεται ρητά.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -29,6 +30,9 @@ Deno.serve(async (req) => {
     if (body.action !== 'delete' || body.confirm !== 'ΔΙΑΓΡΑΦΗ') return json(400, { error: 'Λείπει η επιβεβαίωση.' });
 
     const admin = createClient(SB_URL, SERVICE, { auth: { persistSession: false } });
+    // Οι φωτογραφίες προφίλ δεν σβήνονται με CASCADE, οπότε τις αφαιρούμε πρώτα.
+    const { data: files } = await admin.storage.from('avatars').list(user.id, { limit: 100 });
+    if (files?.length) await admin.storage.from('avatars').remove(files.map((f) => `${user.id}/${f.name}`));
     const { error } = await admin.auth.admin.deleteUser(user.id);
     if (error) throw error;
     return json(200, { deleted: true });

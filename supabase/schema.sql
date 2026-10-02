@@ -32,8 +32,17 @@ create table if not exists public.ai_usage (
 -- μόνο μέσω της παρακάτω συνάρτησης.
 alter table public.ai_usage enable row level security;
 
+-- Λογαριασμοί χωρίς ημερήσιο όριο AI (π.χ. ο διαχειριστής). RLS χωρίς policies:
+-- η εφαρμογή δεν τον βλέπει. Προσθήκη email από το SQL Editor:
+--   insert into public.ai_unlimited (email) values ('someone@example.com');
+create table if not exists public.ai_unlimited (
+  email    text primary key check (email = lower(email)),
+  added_at timestamptz not null default now()
+);
+alter table public.ai_unlimited enable row level security;
+
 -- Αυξάνει τον μετρητή του συνδεδεμένου χρήστη. Επιστρέφει τον νέο αριθμό,
--- ή -1 αν ξεπεράστηκε το όριο.
+-- ή -1 αν ξεπεράστηκε το όριο (εκτός αν ο χρήστης είναι στο ai_unlimited).
 create or replace function public.bump_ai_usage(p_limit int)
 returns int
 language plpgsql
@@ -41,8 +50,9 @@ security definer
 set search_path = ''
 as $$
 declare
-  uid uuid := auth.uid();
-  c   int;
+  uid       uuid := auth.uid();
+  c         int;
+  unlimited boolean;
 begin
   if uid is null then
     raise exception 'not authenticated';
@@ -51,7 +61,12 @@ begin
   values (uid, current_date, 1)
   on conflict (user_id, day) do update set count = u.count + 1
   returning u.count into c;
-  if c > p_limit then
+  select exists (
+    select 1 from auth.users au
+    join public.ai_unlimited x on x.email = lower(au.email)
+    where au.id = uid
+  ) into unlimited;
+  if c > p_limit and not unlimited then
     return -1;
   end if;
   return c;

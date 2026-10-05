@@ -1,6 +1,6 @@
 // Service worker: κρατά την εφαρμογή διαθέσιμη χωρίς σύνδεση και εμφανίζει τις ειδοποιήσεις push.
 // Άλλαξε το VERSION όταν ανεβάζεις νέα έκδοση ώστε να ανανεωθεί η cache.
-const VERSION = 'nutrilog-v7';
+const VERSION = 'nutrilog-v8'; // ίδιο με το SW_VERSION στο index.html
 const SHELL = ['./', './index.html', './config.js', './privacy.html', './terms.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './icon.svg', './apple-touch-icon.png'];
 const CDN = 'cdn.jsdelivr.net';
 
@@ -11,7 +11,10 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys()
     .then(keys => Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k))))
-    .then(() => self.clients.claim()));
+    .then(() => self.clients.claim())
+    // Λέμε στις ανοιχτές σελίδες ποια έκδοση ενεργοποιήθηκε, ώστε οι παλιές να δείξουν «Νέα έκδοση».
+    .then(() => self.clients.matchAll({ type: 'window' }))
+    .then((list) => list.forEach((c) => c.postMessage({ type: 'sw-version', version: VERSION }))));
 });
 
 self.addEventListener('fetch', e => {

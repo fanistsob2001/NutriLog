@@ -3,6 +3,7 @@
 //  - action "cron": καλείται κάθε 15' από το pg_cron (με x-cron-secret) και στέλνει όσες
 //    υπενθυμίσεις «λήγουν» τώρα, στην τοπική ώρα κάθε χρήστη.
 //  - action "test": ο συνδεδεμένος χρήστης ζητά δοκιμαστική ειδοποίηση στις συσκευές του.
+//  - action "broadcast": ανακοίνωση σε όλους με ενεργές ειδοποιήσεις (μόνο με x-cron-secret).
 // Τα κλειδιά (VAPID, cron secret) βρίσκονται στον πίνακα public.app_secrets,
 // που διαβάζεται μόνο με το service role.
 
@@ -161,6 +162,27 @@ Deno.serve(async (req) => {
     if (body.action === 'cron') {
       if (!keys.cron_secret || req.headers.get('x-cron-secret') !== keys.cron_secret) return json(401, { error: 'unauthorized' });
       return json(200, await runCron(keys));
+    }
+
+    // Ανακοίνωση (π.χ. νέα έκδοση) σε όσους έχουν ενεργές ειδοποιήσεις. Μόνο με το cron secret,
+    // δηλαδή από τη βάση: select net.http_post(... 'x-cron-secret' ..., body := '{"action":"broadcast",...}')
+    if (body.action === 'broadcast') {
+      if (!keys.cron_secret || req.headers.get('x-cron-secret') !== keys.cron_secret) return json(401, { error: 'unauthorized' });
+      const title = String(body.title ?? '').slice(0, 80), text = String(body.body ?? '').slice(0, 240);
+      if (!title) return json(400, { error: 'title required' });
+      const { data: subs, error } = await admin.from('push_subscriptions').select('*');
+      if (error) throw error;
+      const targets = ((subs ?? []) as Sub[]).filter((s) => s.prefs?.enabled);
+      let sent = 0;
+      for (const sub of targets) {
+        try {
+          const st = await send(sub, { title, body: text, tag: String(body.tag ?? 'announce').slice(0, 40), url: APP_URL + String(body.hash ?? '') }, keys);
+          if (st < 300) sent++;
+        } catch (e) {
+          console.error('broadcast failed', e);
+        }
+      }
+      return json(200, { subs: subs?.length ?? 0, targets: targets.length, sent });
     }
 
     if (body.action === 'test') {

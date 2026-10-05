@@ -506,6 +506,17 @@ details.acc summary::-webkit-details-marker{display:none}
 .consent{display:flex;gap:10px;align-items:flex-start;background:var(--card2);border-radius:16px;padding:13px;margin-top:14px;font-size:13.5px;cursor:pointer;font-weight:600}
 .consent input{width:20px;height:20px;flex:none;accent-color:var(--accent);margin-top:1px}
 
+/* αναβάθμιση & τι νέο */
+.upd{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top));transform:translateX(-50%);z-index:150;display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:8px 8px 8px 16px;box-shadow:var(--shadow-lg);font-weight:800;font-size:14px;white-space:nowrap;animation:sheetIn .3s}
+.wn-hero{text-align:center;margin:2px 0 8px}
+.wn-hero .badge{margin:0 auto}
+.wn-hero h2{margin:10px 0 2px;font-size:22px;letter-spacing:-.03em;font-weight:800}
+.wn-hero p{margin:0;font-weight:650}
+.wn-it{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--border)}
+.wn-it .e{width:40px;height:40px;border-radius:13px;background:var(--accent-soft);display:grid;place-items:center;font-size:19px;flex:none}
+.wn-it b{display:block;font-weight:800}
+.wn-it small{color:var(--muted);font-size:13px;font-weight:600;line-height:1.4;display:block}
+
 /* chat */
 .bot-h{display:flex;align-items:center;gap:10px}
 .bot-av{width:40px;height:40px;border-radius:14px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:19px;flex:none;box-shadow:0 4px 12px rgba(20,144,91,.3)}
@@ -628,6 +639,7 @@ canvas.confetti{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:n
 </div></dialog>
 <div class="celebrate" id="celebrate" hidden><div class="cel-card"><div class="e" id="celE"></div><b id="celT"></b><p id="celD"></p><button class="btn primary block" data-act="celClose">Τέλεια!</button></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="upd" id="updBar" role="status" hidden><span>🎉 Νέα έκδοση διαθέσιμη</span><button class="btn primary sm" data-act="reloadApp">Ανανέωση</button></div>
 <input type="file" id="fileCam" accept="image/*" capture="environment" hidden>
 <input type="file" id="fileGal" accept="image/*" hidden>
 <input type="file" id="fileBarcode" accept="image/*" hidden>
@@ -779,6 +791,32 @@ const ACH=[
 ];
 const VAPID_PUBLIC='BPTYPxMAUPxSAoSJR3pBcJUMfKe9ZQA2S2A6jtCM6mdJXWvFlnmbq13xXSXNOMgIivHcl8cb5PkPg1rcZxNIGNk';
 const CONSENT_VERSION=1;
+/* ---------- Εκδόσεις ----------
+   Σε κάθε νέα έκδοση: ανέβασε το APP_VERSION, πρόσθεσε εγγραφή στην αρχή του CHANGELOG
+   και άλλαξε το VERSION στο sw.js (ίδιο με το SW_VERSION εδώ). */
+const APP_VERSION=5,SW_VERSION='nutrilog-v8';
+const CHANGELOG=[
+  {v:5,date:'Οκτώβριος 2026',t:'Νέο design & ακριβής σάρωση ετικέτας',items:[
+    ['🧾','Σάρωση ετικέτας','Φωτογράφισε τον πίνακα «Διατροφικά στοιχεία» μιας συσκευασίας και καταγράφονται ακριβώς οι τιμές που είναι τυπωμένες. Φωτογραφία → Ετικέτα.'],
+    ['🎨','Νέο design','Φωτεινό θέμα σε λαχανί και σκοτεινό σε πετρόλ, κάρτα θερμίδων με ημικύκλιο και νέο λογότυπο.'],
+    ['🍽️','Γεύματα σε πλακίδια','Πάτα ένα γεύμα για να δεις τι έφαγες, να προσθέσεις ή να το αποθηκεύσεις.'],
+    ['✏️','Επεξεργασία τροφίμων','Πάτα ένα τρόφιμο για να αλλάξεις την ποσότητα ή το γεύμα, με όλα τα διατροφικά στοιχεία.'],
+    ['⚡','Γρηγορότερη καταγραφή','Το + στα «Πρόσφατα» βάζει την ίδια ποσότητα με την τελευταία φορά. Τα προϊόντα δείχνουν Nutri-Score.'],
+    ['📚','Οδηγός διατροφής','Τι κάνει κάθε θρεπτικό, πώς διαβάζεις μια ετικέτα και πώς καταγράφεις σωστά. Πάτα ⓘ ή μια μπάρα στο Σήμερα.'],
+    ['🧭','Πιο απλή εφαρμογή','3 καρτέλες, και όσα χρειάζεσαι σπάνια στο Προφίλ → Περισσότερες ρυθμίσεις.']]},
+  {v:4,t:'Προφίλ με φωτογραφία',items:[
+    ['📷','Επεξεργασία προφίλ','Φωτογραφία προφίλ, όνομα, σωματικά στοιχεία, στόχος βάρους και αλλαγή κωδικού.'],
+    ['✨','Ανανεωμένη εμφάνιση','Νέα γραμματοσειρά, κάρτες και κάτω μπάρα.']]},
+  {v:3,t:'Barcode, υπενθυμίσεις & επιτεύγματα',items:[
+    ['🏷️','Barcode','Σάρωση συσκευασιών και αναζήτηση σε εκατομμύρια προϊόντα.'],
+    ['⭐','Αποθηκευμένα γεύματα','Βάλε αγαπημένα γεύματα με ένα πάτημα ή «Όπως χθες».'],
+    ['🔔','Υπενθυμίσεις','Ειδοποιήσεις για γεύματα, νερό και streak.'],
+    ['🏅','Επιτεύγματα','Παράσημα και πάγωμα streak μία φορά τον μήνα.'],
+    ['💬','Καταγραφή με κουβέντα','Γράψε στον Nutri τι έφαγες και το καταγράφει, προτάσεις γευμάτων και εβδομαδιαία ανασκόπηση.']]},
+  {v:2,t:'Λογαριασμοί & Nutri',items:[
+    ['☁️','Λογαριασμοί','Σύνδεση με Google ή email και συγχρονισμός σε όλες τις συσκευές.'],
+    ['🤖','Βοηθός Nutri','Ρώτα οτιδήποτε για την εφαρμογή ή τη διατροφή σου.']]}
+];
 
 /* ---------- Οδηγός θρεπτικών (γενικές πληροφορίες, όχι ιατρική συμβουλή) ---------- */
 const GUIDE={
@@ -903,7 +941,7 @@ function defState(){return{
   profile:{name:'',sex:'m',age:25,height:175,weight:75,activity:1.55,goal:'maintain',targetWeight:null,avatar:''},
   goals:{kcal:2200,protein:130,carbs:250,fat:70,fiber:30,sugar:55,water:2500},
   settings:{model:'',tolerance:10,requireProtein:false,theme:'auto',reminders:{...DEF_REM}},
-  customFoods:[],savedMeals:[],days:{},freezes:{},reviews:{},achSeen:null,celebrated:'',consent:null,onboarded:false,updatedAt:0
+  customFoods:[],savedMeals:[],days:{},freezes:{},reviews:{},achSeen:null,celebrated:'',consent:null,onboarded:false,seenVersion:0,updatedAt:0
 }}
 function normalize(r){
   const d=defState();if(!r||typeof r!=='object')return d;
@@ -916,7 +954,7 @@ function normalize(r){
   return{profile:{...d.profile,...r.profile},goals:{...d.goals,...r.goals},settings,
     customFoods:Array.isArray(r.customFoods)?r.customFoods:[],savedMeals:Array.isArray(r.savedMeals)?r.savedMeals:[],days,
     freezes:obj(r.freezes),reviews:obj(r.reviews),achSeen:Array.isArray(r.achSeen)?r.achSeen:null,celebrated:r.celebrated||'',
-    consent:r.consent||null,onboarded:r.onboarded!==undefined?!!r.onboarded:Object.keys(days).length>0,updatedAt:+r.updatedAt||0};
+    consent:r.consent||null,onboarded:r.onboarded!==undefined?!!r.onboarded:Object.keys(days).length>0,seenVersion:+r.seenVersion||0,updatedAt:+r.updatedAt||0};
 }
 let S=defState(),user=null,appUid=null,recovery=false;
 let tab='today',curDate=new Date();
@@ -1027,7 +1065,7 @@ function confetti(){
     if(++t<180)requestAnimationFrame(f);else c.remove()})();
 }
 function celebrate(e,t,d){celQueue.push([e,t,d]);if($('#celebrate').hidden)nextCel()}
-function nextCel(){const n=celQueue.shift();if(!n){$('#celebrate').hidden=true;return}
+function nextCel(){const n=celQueue.shift();if(!n){$('#celebrate').hidden=true;if(pendingWN){pendingWN=false;setTimeout(()=>openWhatsNew(true),300)}return}
   $('#celE').textContent=n[0];$('#celT').textContent=n[1];$('#celD').textContent=n[2];$('#celebrate').hidden=false;confetti()}
 let checking=false;
 function checkCelebrations(){
@@ -1067,7 +1105,7 @@ async function loadData(){
   let src=cloud&&local?((+local.updatedAt||0)>(+cloud.updatedAt||0)?local:cloud):(cloud||local),migrated=false;
   if(!src){try{const old=JSON.parse(localStorage.getItem('nutrilog-v1'));if(old){src=old;migrated=true}}catch(e){}}
   S=normalize(src);
-  if(migrated){S.onboarded=true;S.updatedAt=Date.now();try{localStorage.removeItem('nutrilog-v1')}catch(e){}}
+  if(migrated){S.onboarded=true;S.seenVersion=APP_VERSION;S.updatedAt=Date.now();try{localStorage.removeItem('nutrilog-v1')}catch(e){}}
   writeCache();
   if(DEMO)return;
   if(!cloudOk)setSync('offline');
@@ -1328,7 +1366,7 @@ async function startApp(){
   showScreen('app');render();
   if(!S.onboarded)openWizard(true);
   else if(!S.consent||S.consent.v<CONSENT_VERSION)openConsent();
-  else setTimeout(checkCelebrations,800);
+  else{setTimeout(checkCelebrations,800);setTimeout(()=>maybeWhatsNew(startHash==='#whatsnew'),1300)}
   if(S.settings.reminders.enabled)ensurePushSub(false).catch(()=>{});
 }
 function onSignedOut(){stopScanner();user=null;appUid=null;S=defState();chat.msgs=[];models={list:null,auto:'',loading:false,err:''};
@@ -1796,7 +1834,7 @@ function renderSettings(){
   </section>
   <button class="btn block" data-act="logout">Αποσύνδεση</button>
   <div class="legal" style="margin-top:14px"><a href="privacy.html">Πολιτική Απορρήτου</a><a href="terms.html">Όροι Χρήσης</a></div>
-  <p class="small muted" style="text-align:center;margin-top:0">NutriLog · έκδοση 5 · Δεδομένα προϊόντων: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a> (ODbL)</p>`;
+  <p class="small muted" style="text-align:center;margin-top:0">NutriLog · <button class="link" data-act="whatsNew">έκδοση ${APP_VERSION} · τι νέο</button> · Δεδομένα προϊόντων: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a> (ODbL)</p>`;
 }
 function renderMore(){
   const g=S.goals,st=S.settings,tol=(+st.tolerance||10)/100;
@@ -1805,6 +1843,7 @@ function renderMore(){
   <div class="page-title" style="margin-top:6px">Περισσότερες ρυθμίσεις</div>
 
   <section class="card links">
+    <button class="lrow" data-act="whatsNew"><span class="e">🆕</span><span class="t"><b>Τι νέο</b><small>Έκδοση ${APP_VERSION} · τι άλλαξε σε κάθε αναβάθμιση</small></span></button>
     <button class="lrow" data-act="guide"><span class="e">📚</span><span class="t"><b>Οδηγός διατροφής</b><small>Τι κάνει κάθε θρεπτικό, πώς διαβάζεις μια ετικέτα, πώς καταγράφεις με ακρίβεια</small></span></button>
   </section>
 
@@ -1879,6 +1918,28 @@ function nfHtml(v,title){
     ${row('fat','Λιπαρά')}${row('satfat','εκ των οποίων κορεσμένα',1)}${row('carbs','Υδατάνθρακες')}${row('sugar','εκ των οποίων σάκχαρα',1)}${row('fiber','Φυτικές ίνες')}${row('protein','Πρωτεΐνες')}
     ${v.sodium!=null?`<div class="r"><span>Αλάτι</span><b>${fmtN(r2(v.sodium/400))} g</b></div>`:''}
     ${vm?`<div class="r thick"><span class="small muted" style="font-weight:700">Βιταμίνες & μέταλλα</span><span></span></div>${row('calcium','Ασβέστιο')}${row('iron','Σίδηρος')}${row('potassium','Κάλιο')}${row('vitc','Βιταμίνη C')}`:''}</div>`;
+}
+
+/* ---------- Τι νέο ---------- */
+let pendingWN=false;
+function wnItems(c){return c.items.map(([e,t,d])=>`<div class="wn-it"><span class="e">${e}</span><div><b>${esc(t)}</b><small>${esc(d)}</small></div></div>`).join('')}
+function openWhatsNew(auto){
+  const [cur,...old]=CHANGELOG;
+  $('#infoIn').innerHTML=`<div class="sheet-head"><h3>🆕 Τι νέο</h3><button class="icon-btn" data-act="closeInfo" aria-label="Κλείσιμο">✕</button></div>
+  <div class="sheet-scroll">
+    <div class="wn-hero"><span class="badge hit">Έκδοση ${cur.v}${cur.date?' · '+esc(cur.date):''}</span><h2>${auto?'🎉 Η εφαρμογή αναβαθμίστηκε!':esc(cur.t)}</h2>${auto?`<p class="muted">${esc(cur.t)}</p>`:''}</div>
+    ${wnItems(cur)}
+    ${auto?'<button class="btn primary block lg" style="margin:14px 0 6px" data-act="closeInfo">Τέλεια, ας ξεκινήσουμε!</button>':''}
+    <div class="gd-grp">Προηγούμενες εκδόσεις</div>
+    ${old.map(c=>`<details class="gd"><summary><span class="e" style="background:var(--card2)">📦</span><b>Έκδοση ${c.v}<small>${esc(c.t)}</small></b></summary><div class="gd-body">${wnItems(c)}</div></details>`).join('')}
+  </div>`;
+  const d=$('#infoDlg');if(!d.open)d.showModal();
+  if(S.seenVersion!==APP_VERSION){S.seenVersion=APP_VERSION;save()}
+}
+function maybeWhatsNew(force){
+  if(!force&&!(S.onboarded&&S.seenVersion<APP_VERSION))return;
+  if(!$('#celebrate').hidden||celQueue.length){pendingWN=true;return}
+  openWhatsNew(!force);
 }
 
 /* ---------- Γεύμα (από το πλακίδιο στο Σήμερα) ---------- */
@@ -2352,10 +2413,10 @@ const A={
   wzSet:el=>{wiz.p[el.dataset.f]=el.dataset.f==='activity'?parseFloat(el.dataset.v):el.dataset.v;renderWizard()},
   wzStep:el=>{const f=el.dataset.f,v=r1((+wiz.p[f]||0)+(+el.dataset.d));wiz.p[f]=v;const i=document.querySelector(`[data-wiz="${f}"]`);if(i)i.value=v},
   wzNav:el=>{const d=+el.dataset.d;if(d>0){const e=wizValid();if(e){toast(e);return}}wiz.step=clamp(wiz.step+d,wiz.first?0:1,4);renderWizard();$('#wizIn').scrollTop=0},
-  wzDone:()=>{const first=wiz.first;if(!S.consent&&wiz.agree)giveConsent();S.profile={...wiz.p,name:(wiz.p.name||'').trim()};S.goals=calcGoals(S.profile).goals;S.onboarded=true;save();$('#wizDlg').close();wiz=null;render();
+  wzDone:()=>{const first=wiz.first;if(!S.consent&&wiz.agree)giveConsent();S.profile={...wiz.p,name:(wiz.p.name||'').trim()};S.goals=calcGoals(S.profile).goals;S.onboarded=true;S.seenVersion=APP_VERSION;save();$('#wizDlg').close();wiz=null;render();
     toast('Οι στόχοι σου αποθηκεύτηκαν 🎯');if(first)setTimeout(openChat,500)},
   wzSkip:()=>{if(!S.consent&&!wiz.agree){toast('Για να συνεχίσεις, αποδέξου τους όρους και την πολιτική απορρήτου.');return}
-    if(!S.consent)giveConsent();S.onboarded=true;if(wiz.p.name)S.profile.name=wiz.p.name.trim();save();$('#wizDlg').close();wiz=null;render()},
+    if(!S.consent)giveConsent();S.onboarded=true;S.seenVersion=APP_VERSION;if(wiz.p.name)S.profile.name=wiz.p.name.trim();save();$('#wizDlg').close();wiz=null;render()},
   wzClose:()=>{$('#wizDlg').close();wiz=null},
   // βοηθός
   chat:openChat,
@@ -2367,7 +2428,9 @@ const A={
     a.items.forEach(it=>dayObj(k).entries.push({id:uid(),...itemToEntry(it,a.meal,'ai')}));a.done='added';save();saveChat();renderChat();
     if(tab==='today')render();toast(`Προστέθηκε στο ${mealName(a.meal)}`)},
   actCancel:el=>{const [mi,ai_]=el.dataset.k.split(':').map(Number),a=chat.msgs[mi]&&chat.msgs[mi].actions[ai_];if(a){a.done='cancelled';saveChat();renderChat()}},
-  celClose:nextCel
+  celClose:nextCel,
+  whatsNew:()=>openWhatsNew(false),
+  reloadApp:()=>location.reload()
 };
 
 document.addEventListener('click',e=>{
@@ -2441,7 +2504,7 @@ document.addEventListener('change',async e=>{
   if(el.id==='fileImport'){const file=el.files[0];el.value='';if(!file)return;
     file.text().then(t=>{const j=JSON.parse(t);if(!j||typeof j!=='object'||!j.days)throw new Error('bad');
       if(!confirm('Η εισαγωγή θα αντικαταστήσει τα τρέχοντα δεδομένα σου. Συνέχεια;'))return;
-      const c=S.consent;S=normalize(j);S.onboarded=true;S.consent=S.consent||c;save();applyTheme(S.settings.theme);render();toast('Η εισαγωγή ολοκληρώθηκε')}).catch(()=>toast('Μη έγκυρο αρχείο'))}
+      const c=S.consent;S=normalize(j);S.onboarded=true;S.seenVersion=APP_VERSION;S.consent=S.consent||c;save();applyTheme(S.settings.theme);render();toast('Η εισαγωγή ολοκληρώθηκε')}).catch(()=>toast('Μη έγκυρο αρχείο'))}
 });
 document.addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ')&&e.target.getAttribute&&e.target.getAttribute('role')==='button'&&e.target.dataset.act){e.preventDefault();e.target.click();return}
@@ -2454,7 +2517,16 @@ document.addEventListener('dragleave',e=>{const z=e.target.closest&&e.target.clo
 document.addEventListener('drop',e=>{const z=e.target.closest&&e.target.closest('#dropZone');if(!z)return;e.preventDefault();z.classList.remove('drag');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadImage(f)});
 
 boot();
-if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
+  // Ο νέος service worker στέλνει την έκδοσή του· αν διαφέρει από αυτή της σελίδας, η σελίδα είναι παλιά.
+  navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.type==='sw-version'&&e.data.version!==SW_VERSION)$('#updBar').hidden=false});
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    const check=()=>reg.update().catch(()=>{});
+    setInterval(check,30*60e3);
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')check()});
+  }).catch(()=>{});
+}
+window.addEventListener('hashchange',()=>{if(location.hash==='#whatsnew'&&user){history.replaceState(null,'',APP_URL);openWhatsNew(false)}});
 </script>
 </body>
 </html>

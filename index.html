@@ -4,9 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>NutriLog</title>
-<meta name="theme-color" content="#2f9e5b">
+<meta name="theme-color" content="#e6f3eb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#062330" media="(prefers-color-scheme: dark)">
 <meta name="description" content="NutriLog: καταγραφή θερμίδων και μακροθρεπτικών, σάρωση barcode, AI ανάλυση γευμάτων από φωτογραφία, streak και πρόοδος.">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,33 +20,38 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400..800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f2f6f1;--bg-tint:#e3f1e6;--card:#ffffff;--card2:#f1f5f0;--text:#13201a;--muted:#67736c;--border:#e3e9e2;
-  --accent:#1fa35c;--accent2:#0e7a4c;--accent-soft:#dff3e6;--accent-text:#13743f;
-  --hero:linear-gradient(140deg,#27b46c 0%,#14905b 55%,#0d6f56 100%);
-  --warn:#e8902a;--warn-soft:#fdeedb;--danger:#dc4a4a;--danger-soft:#fde5e5;--none:#e5eae4;
+  --bg:#e6f3eb;--bg-tint:#d2ecdc;--card:#ffffff;--card2:#f2f8ef;--text:#1c2a1f;--muted:#66756a;--border:#dde9dc;
+  --accent:#7bb52d;--accent2:#5d8c1f;--accent-soft:#e8f4d3;--accent-text:#4b7614;--on-accent:#17260a;
+  --hero:linear-gradient(145deg,#c6e660 0%,#a6d147 50%,#8dc23b 100%);--on-hero:#1d2e0b;
+  --btn:linear-gradient(140deg,#72aa2b 0%,#4f8519 100%);--on-btn:#ffffff;--btn-glow:rgba(79,133,25,.3);
+  --brand:linear-gradient(135deg,#b9e34b 0%,#6dc87d 52%,#38a8c2 100%);
+  --gold:#ffcf3f;--gold-ink:#4d3a00;
+  --warn:#e08a1e;--warn-soft:#fdeedb;--danger:#dc4a4a;--danger-soft:#fde5e5;--none:#e3ece2;
   --ice:#3f9ae0;--ice-soft:#dcecfa;
   --protein:#3b82f6;--carbs:#f2a516;--fat:#e0508f;--fiber:#10a37f;--sugar:#9b5de5;--water:#0ea5e9;
-  --shadow:0 1px 2px rgba(17,45,28,.04),0 8px 24px rgba(17,45,28,.06);
-  --shadow-lg:0 12px 40px rgba(17,45,28,.14);
+  --shadow:0 1px 2px rgba(28,52,20,.04),0 8px 24px rgba(28,52,20,.07);
+  --shadow-lg:0 12px 40px rgba(28,52,20,.15);
   --radius:24px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0c110f;--bg-tint:#112018;--card:#151c18;--card2:#1c2520;--text:#e9efeb;--muted:#93a099;--border:#232d28;
-    --accent:#34c477;--accent2:#1f9a5c;--accent-soft:#173326;--accent-text:#7fe0a8;
-    --hero:linear-gradient(140deg,#1f9c5c 0%,#137a4c 55%,#0d5a43 100%);
-    --warn:#f2a447;--warn-soft:#3a2c17;--danger:#f06a6a;--danger-soft:#3d1f1f;--none:#252f2a;
-    --ice:#6cb4ee;--ice-soft:#1b3044;
-    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.18);--shadow-lg:0 12px 40px rgba(0,0,0,.45);
+    --bg:#062330;--bg-tint:#0a3a48;--card:#0b3e4b;--card2:#0f4857;--text:#e6f4f1;--muted:#92b9b5;--border:#155567;
+    --accent:#22cf7c;--accent2:#18b067;--accent-soft:#0f5547;--accent-text:#62e6a5;--on-accent:#05261d;
+    --hero:linear-gradient(145deg,#3ae696 0%,#22d07d 55%,#18b86c 100%);--on-hero:#04261c;
+    --btn:linear-gradient(140deg,#33de8c 0%,#19ba6d 100%);--on-btn:#04261c;--btn-glow:rgba(34,207,124,.28);
+    --warn:#f2a447;--warn-soft:#3d3218;--danger:#f06a6a;--danger-soft:#47252b;--none:#11505f;
+    --ice:#6cb4ee;--ice-soft:#173d5c;
+    --shadow:0 1px 2px rgba(0,0,0,.25),0 8px 24px rgba(0,0,0,.18);--shadow-lg:0 12px 40px rgba(0,0,0,.4);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0c110f;--bg-tint:#112018;--card:#151c18;--card2:#1c2520;--text:#e9efeb;--muted:#93a099;--border:#232d28;
-  --accent:#34c477;--accent2:#1f9a5c;--accent-soft:#173326;--accent-text:#7fe0a8;
-  --hero:linear-gradient(140deg,#1f9c5c 0%,#137a4c 55%,#0d5a43 100%);
-  --warn:#f2a447;--warn-soft:#3a2c17;--danger:#f06a6a;--danger-soft:#3d1f1f;--none:#252f2a;
-  --ice:#6cb4ee;--ice-soft:#1b3044;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.18);--shadow-lg:0 12px 40px rgba(0,0,0,.45);
+  --bg:#062330;--bg-tint:#0a3a48;--card:#0b3e4b;--card2:#0f4857;--text:#e6f4f1;--muted:#92b9b5;--border:#155567;
+  --accent:#22cf7c;--accent2:#18b067;--accent-soft:#0f5547;--accent-text:#62e6a5;--on-accent:#05261d;
+  --hero:linear-gradient(145deg,#3ae696 0%,#22d07d 55%,#18b86c 100%);--on-hero:#04261c;
+  --btn:linear-gradient(140deg,#33de8c 0%,#19ba6d 100%);--on-btn:#04261c;--btn-glow:rgba(34,207,124,.28);
+  --warn:#f2a447;--warn-soft:#3d3218;--danger:#f06a6a;--danger-soft:#47252b;--none:#11505f;
+  --ice:#6cb4ee;--ice-soft:#173d5c;
+  --shadow:0 1px 2px rgba(0,0,0,.25),0 8px 24px rgba(0,0,0,.18);--shadow-lg:0 12px 40px rgba(0,0,0,.4);
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -61,10 +68,11 @@ b,strong{font-weight:750}
 .num,.ring-txt b,.stat b,.goal-hero b,.sc b,.avg b,.mini b,.water-val b,.big{font-variant-numeric:tabular-nums}
 
 /* top bar */
+.logo svg{width:84%;height:84%;display:block}
 .top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px)}
 .top .in{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;max-width:760px;margin:0 auto}
 .brand{font-weight:800;font-size:19px;letter-spacing:-.03em;display:flex;align-items:center;gap:9px}
-.logo{width:30px;height:30px;border-radius:10px;background:var(--hero);display:grid;place-items:center;color:#fff;font-style:normal;font-size:16px;font-weight:800;box-shadow:0 4px 12px rgba(20,144,91,.35)}
+.logo{width:32px;height:32px;border-radius:10px;background:var(--brand);display:grid;place-items:center;color:#fff;font-style:normal;font-size:16px;font-weight:800;box-shadow:0 4px 12px rgba(20,144,91,.35)}
 .top-r{display:flex;align-items:center;gap:10px}
 .pill{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:99px;background:var(--card);color:var(--warn);font-weight:800;font-size:14px;box-shadow:var(--shadow)}
 .sync{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none;box-shadow:0 0 0 3px var(--accent-soft)}
@@ -90,7 +98,7 @@ main{max-width:760px;margin:0 auto;padding:4px 16px 24px}
 .icon-btn:disabled{opacity:.35;cursor:default;box-shadow:none}
 .btn{border:1px solid var(--border);background:var(--card);border-radius:14px;padding:11px 16px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s,filter .15s;color:var(--text)}
 .btn:active{transform:scale(.97)}
-.btn.primary{background:var(--hero);border-color:transparent;color:#fff;box-shadow:0 6px 18px rgba(20,144,91,.28)}
+.btn.primary{background:var(--btn);border-color:transparent;color:var(--on-btn);box-shadow:0 6px 18px var(--btn-glow)}
 .btn.primary:hover{filter:brightness(1.05)}
 .btn.danger{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 45%,transparent);background:transparent}
 .btn.block{width:100%}
@@ -112,37 +120,51 @@ label.f{display:block;font-size:13px;color:var(--muted);margin:12px 0 6px;font-w
 .date-title strong{font-size:16px;font-weight:800}
 .date-title span{font-size:13px;color:var(--muted);font-weight:600}
 
-/* hero */
-.hero{display:flex;gap:20px;align-items:center;background:var(--hero);color:#fff;border:0;box-shadow:0 14px 34px rgba(20,120,80,.32);position:relative;overflow:hidden}
-.hero::before{content:"";position:absolute;width:280px;height:280px;right:-90px;top:-120px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.18),transparent 65%)}
-.hero::after{content:"";position:absolute;width:200px;height:200px;left:-70px;bottom:-110px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.1),transparent 65%)}
-.ring{position:relative;width:156px;height:156px;flex:none;z-index:1}
-.ring svg{width:100%;height:100%}
-.ring-bg{fill:none;stroke:rgba(255,255,255,.2);stroke-width:13}
-.ring-fg{fill:none;stroke:#fff;stroke-width:13;stroke-linecap:round;transition:stroke-dasharray .6s cubic-bezier(.3,.8,.3,1);filter:drop-shadow(0 2px 6px rgba(0,0,0,.15))}
-.ring-fg.over{stroke:#ffd0c4}
-.ring-txt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.ring-txt b{font-size:32px;letter-spacing:-.04em;line-height:1;font-weight:800}
-.ring-txt span{font-size:12px;opacity:.85;margin-top:5px;font-weight:600}
-.hero-side{flex:1;display:flex;flex-direction:column;gap:12px;min-width:0;z-index:1}
-.stat span{display:block;font-size:11.5px;opacity:.8;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-.stat b{font-size:24px;letter-spacing:-.03em}
-.stat b.neg{color:#ffd0c4}
-.hero span.badge{background:rgba(255,255,255,.2);color:#fff;backdrop-filter:blur(6px)}
+/* hero: ημικύκλιο θερμίδων + μακροθρεπτικά */
+.hero{background:var(--hero);color:var(--on-hero);border:0;box-shadow:0 14px 34px rgba(110,170,40,.26);position:relative;overflow:hidden;padding:16px 16px 18px}
+.hero::before{content:"";position:absolute;width:280px;height:280px;right:-100px;top:-140px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.38),transparent 65%)}
+.hero::after{content:"";position:absolute;width:220px;height:220px;left:-90px;bottom:-130px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 65%)}
+.gauge-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;position:relative;z-index:1}
+.gauge-side{text-align:center;padding-bottom:10px}
+.gauge-side b{display:block;font-size:21px;font-weight:800;letter-spacing:-.03em;line-height:1.1;font-variant-numeric:tabular-nums}
+.gauge-side span{font-size:11px;font-weight:800;opacity:.72;text-transform:uppercase;letter-spacing:.06em}
+.gauge{position:relative;width:184px;height:110px}
+.gauge svg{width:100%;height:100%;overflow:visible}
+.g-bg{fill:none;stroke:rgba(255,255,255,.5);stroke-width:13;stroke-linecap:round}
+.g-fg{fill:none;stroke:var(--gold);stroke-width:13;stroke-linecap:round;transition:stroke-dasharray .6s cubic-bezier(.3,.8,.3,1);filter:drop-shadow(0 2px 4px rgba(80,60,0,.18))}
+.g-fg.over{stroke:#ff7a59}
+.g-txt{position:absolute;left:0;right:0;bottom:4px;text-align:center}
+.g-txt b{display:block;font-size:36px;font-weight:800;letter-spacing:-.045em;line-height:1;font-variant-numeric:tabular-nums}
+.g-txt span{font-size:12px;font-weight:750;opacity:.75}
+.hero .badge{background:rgba(255,255,255,.5);color:var(--on-hero);display:flex;width:max-content;margin:8px auto 0;position:relative;z-index:1}
+.hmac{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px;position:relative;z-index:1}
+.hmac button{border:0;background:none;color:inherit;font:inherit;padding:0;cursor:pointer;text-align:center;min-width:0}
+.hmac b{font-size:13.5px;font-weight:800;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hmac .bar{height:7px;border-radius:99px;background:rgba(255,255,255,.55);overflow:hidden;margin:5px 0 4px}
+.hmac .bar i{display:block;height:100%;border-radius:99px;transition:width .5s}
+.hmac small{font-size:11.5px;font-weight:750;opacity:.78;font-variant-numeric:tabular-nums}
 .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:99px;font-size:12.5px;font-weight:750;align-self:flex-start;white-space:nowrap}
 .badge.hit{background:var(--accent-soft);color:var(--accent-text)}
 .badge.miss{background:var(--warn-soft);color:var(--warn)}
 .badge.none{background:var(--none);color:var(--muted)}
 .badge.freeze{background:var(--ice-soft);color:var(--ice)}
 
+/* γεύματα σε πλακίδια */
+.meals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.mtile{min-width:0;position:relative;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:16px 10px 30px;text-align:center;cursor:pointer;box-shadow:var(--shadow);color:var(--text);font:inherit;transition:transform .12s}
+.mtile:active{transform:scale(.97)}
+.mtile .mc{width:76px;height:76px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;font-size:36px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.06)}
+.mtile b{display:block;font-size:15px;font-weight:800;letter-spacing:-.01em}
+.mtile small{display:block;color:var(--muted);font-size:12px;font-weight:650;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mtile .kt{position:absolute;right:-1px;bottom:-1px;background:var(--gold);color:var(--gold-ink);font-weight:800;font-size:13px;padding:5px 12px 5px 14px;border-radius:16px 0 24px 0;font-variant-numeric:tabular-nums}
+.mtile .tp{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;border:0;background:var(--accent-soft);color:var(--accent-text);font-size:20px;font-weight:700;display:grid;place-items:center;cursor:pointer}
+.mtile.empty .mc{opacity:.75;filter:saturate(.85)}
+.meal-sum{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:6px}
+.meal-sum div{background:var(--card2);border-radius:14px;padding:8px;text-align:center}
+.meal-sum b{display:block;font-size:16px}
+.meal-sum span{font-size:11px;color:var(--muted);font-weight:700}
+
 /* macros */
-.minis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.mini{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:14px 8px 12px;text-align:center;box-shadow:var(--shadow)}
-.mini .mr{position:relative;width:64px;height:64px;margin:0 auto 8px}
-.mini svg{width:100%;height:100%;transform:rotate(-90deg)}
-.mini .mr span{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;font-weight:800}
-.mini b{display:block;font-size:15px;letter-spacing:-.02em}
-.mini small{display:block;color:var(--muted);font-size:12px;font-weight:650}
 .macros{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px}
 .mbar .lbl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;gap:8px}
 .mbar .lbl b{font-weight:750}
@@ -227,7 +249,7 @@ details.card[open]>summary{margin-bottom:14px}
 .cell{aspect-ratio:1/1;border-radius:13px;background:var(--none);border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;min-width:0;color:var(--text);font-family:inherit}
 .cell .dn{font-weight:800;font-size:14px}
 .cell .dk{font-size:10px;opacity:.85;white-space:nowrap;font-weight:650}
-.cell.hit{background:var(--accent);color:#fff}
+.cell.hit{background:var(--accent);color:var(--on-accent)}
 .cell.miss{background:var(--warn-soft);color:var(--warn)}
 .cell.freeze{background:var(--ice-soft);color:var(--ice)}
 .cell.today{outline:2px solid var(--text);outline-offset:1px}
@@ -314,9 +336,87 @@ table.nt tr.sep td{background:var(--card2);font-size:12px;font-weight:800;color:
 .tabbar button .ic{display:grid;place-items:center;height:26px}
 .tabbar button svg{width:23px;height:23px}
 .tabbar button.on{color:var(--accent-text);background:var(--accent-soft)}
-.fab{position:fixed;right:max(18px,calc(50vw - 360px));bottom:calc(92px + env(safe-area-inset-bottom));height:54px;padding:0 20px 0 16px;border-radius:20px;border:0;background:var(--hero);color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 28px rgba(14,122,76,.4);cursor:pointer;z-index:9;transition:transform .15s}
+.fab{position:fixed;right:max(18px,calc(50vw - 360px));bottom:calc(92px + env(safe-area-inset-bottom));width:56px;height:56px;padding:0;border-radius:20px;border:0;background:var(--brand);color:#fff;font-size:23px;display:grid;place-items:center;box-shadow:0 10px 28px rgba(56,168,150,.4);cursor:pointer;z-index:9;transition:transform .15s}
 .fab:active{transform:scale(.95)}
-.fab span{font-size:20px}
+
+/* minimal: κεφαλίδα, γρήγορες ενέργειες, λεπτά γεύματα, λίστες ρυθμίσεων */
+.hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 2px 14px}
+.hdr>div:first-child{min-width:0}
+.hdr .greet{margin:0;font-size:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr .greet-sub{margin:0}
+.daynav{display:flex;align-items:center;gap:2px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:3px;box-shadow:var(--shadow);flex:none}
+.daynav button{border:0;background:none;min-width:32px;height:32px;border-radius:10px;font-size:18px;color:var(--text);cursor:pointer;font-weight:700}
+.daynav button:disabled{opacity:.3;cursor:default}
+.daynav button.lbl{font-size:13px;font-weight:800;padding:0 8px;background:var(--accent-soft);color:var(--accent-text)}
+.hero-eq{font-size:12px;opacity:.85;font-weight:650;margin-top:2px}
+.qa2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.qa2 button{border:1px solid var(--border);background:var(--card);border-radius:20px;padding:11px 12px;display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px;color:var(--text);box-shadow:var(--shadow);cursor:pointer;transition:transform .1s;text-align:left;line-height:1.25}
+.qa2 button:active{transform:scale(.97)}
+.qa2 .qi{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;font-size:19px;flex:none}
+.qa2 small{display:block;font-size:11.5px;color:var(--muted);font-weight:650}
+.slim{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:10px 12px;margin-bottom:10px;box-shadow:var(--shadow)}
+.slim .mi{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;font-size:19px;flex:none}
+.slim .t{flex:1;min-width:0;font-weight:800;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.slim .plus{width:38px;height:38px;font-size:22px;border-radius:13px}
+.entry[data-act]{cursor:pointer}
+.entry[data-act]:hover .nm b{color:var(--accent-text)}
+.page-title{font-size:24px;font-weight:800;letter-spacing:-.035em;margin:10px 2px 14px}
+.stats2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.links{padding:2px 16px}
+.lrow{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;border-top:1px solid var(--border);padding:13px 0;cursor:pointer;color:var(--text);text-align:left;font:inherit}
+.lrow:first-child{border-top:0}
+.lrow .e{width:38px;height:38px;border-radius:12px;background:var(--card2);display:grid;place-items:center;font-size:18px;flex:none}
+.lrow .t{flex:1;min-width:0}
+.lrow .t b{display:block;font-weight:750}
+.lrow .t small{color:var(--muted);font-size:12.5px;font-weight:600}
+.lrow::after{content:"›";color:var(--muted);font-size:22px;line-height:1}
+.srcs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.srcs button{border:1px solid var(--border);background:var(--card2);border-radius:14px;padding:9px 4px;cursor:pointer;font-weight:750;font-size:12.5px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--text)}
+.srcs button span{font-size:19px}
+.srcs button:hover{border-color:var(--accent)}
+.fr{display:flex;align-items:center;border-bottom:1px solid var(--border)}
+.fr .food-row{border-bottom:0}
+.qadd{width:36px;height:36px;border-radius:12px;border:0;background:var(--accent-soft);color:var(--accent-text);font-size:20px;font-weight:700;cursor:pointer;flex:none;margin-left:4px}
+.qadd:disabled{opacity:1;background:var(--accent);color:var(--on-accent)}
+.ns{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:7px;color:#fff;font-weight:800;font-size:12px;margin-left:6px;vertical-align:2px}
+
+/* διατροφική ετικέτα */
+.nf{border:2px solid var(--text);border-radius:14px;padding:8px 13px 6px;margin-top:12px}
+.nf h4{margin:0 0 2px;font-size:15px;font-weight:800;letter-spacing:-.01em}
+.nf .r{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-top:1px solid var(--border);font-size:13.5px}
+.nf .r b{font-weight:800;white-space:nowrap}
+.nf .r.sub{padding-left:14px;color:var(--muted);font-weight:600}
+.nf .r.thick{border-top:4px solid var(--text)}
+table.lbl{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:12px;table-layout:fixed}
+table.lbl th{font-size:11.5px;color:var(--muted);text-align:right;font-weight:800;padding:4px}
+table.lbl th:first-child{text-align:left;width:42%}
+table.lbl td{padding:4px;border-top:1px solid var(--border);vertical-align:middle}
+table.lbl td:first-child{font-weight:750;line-height:1.25}
+table.lbl tr.sub td:first-child{padding-left:14px;color:var(--muted);font-weight:650;font-size:12.5px}
+table.lbl input{padding:7px 8px;text-align:right;border-radius:10px;font-weight:750}
+table.lbl .u{font-size:11px;color:var(--muted);font-weight:700}
+.warn{background:var(--warn-soft);color:var(--warn);border-radius:16px;padding:11px 13px;font-size:13.5px;font-weight:650;margin-top:10px}
+.warn ul{margin:4px 0 0;padding-left:18px}
+
+/* οδηγός θρεπτικών */
+.ninfo{border:0;background:none;color:var(--muted);cursor:pointer;font-size:13px;padding:0 0 0 5px;font-weight:800;line-height:1}
+.ninfo:hover{color:var(--accent-text)}
+.gd{border-top:1px solid var(--border)}
+.gd:first-of-type{border-top:0}
+.gd summary{display:flex;align-items:center;gap:12px;padding:11px 0;cursor:pointer;list-style:none}
+.gd summary::-webkit-details-marker{display:none}
+.gd summary .e,.gd-h .e{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:21px;flex:none}
+.gd summary b{flex:1;font-size:15px}
+.gd summary small{display:block;color:var(--muted);font-weight:600;font-size:12.5px}
+.gd summary::after{content:"›";transform:rotate(90deg);color:var(--muted);font-size:22px;transition:.2s}
+.gd[open] summary::after{transform:rotate(-90deg)}
+.gd-body{padding:0 0 14px}
+.gd-body h5{margin:12px 0 4px;font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:800}
+.gd-body p{margin:0 0 4px;font-size:14px}
+.gd-body ul{margin:0;padding-left:20px;font-size:14px}
+.gd-body li{margin:3px 0}
+.gd-h{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.gd-grp{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:800;margin:16px 0 2px}
 
 /* dialogs */
 dialog.sheet{border:0;padding:0;background:var(--card);color:var(--text);border-radius:28px;width:min(560px,calc(100vw - 20px));max-height:calc(100dvh - 30px);box-shadow:0 24px 70px rgba(0,0,0,.3)}
@@ -408,12 +508,12 @@ details.acc summary::-webkit-details-marker{display:none}
 
 /* chat */
 .bot-h{display:flex;align-items:center;gap:10px}
-.bot-av{width:40px;height:40px;border-radius:14px;background:var(--hero);color:#fff;display:grid;place-items:center;font-size:19px;flex:none;box-shadow:0 4px 12px rgba(20,144,91,.3)}
+.bot-av{width:40px;height:40px;border-radius:14px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:19px;flex:none;box-shadow:0 4px 12px rgba(20,144,91,.3)}
 .bot-h h3{margin:0;font-size:16px}
 .bot-h small{font-size:12px;font-weight:600}
 .chat-log{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 2px 12px;min-height:200px}
 .bubble{max-width:88%;padding:11px 14px;border-radius:20px;font-size:14.5px;line-height:1.55;word-wrap:break-word}
-.bubble.user{align-self:flex-end;background:var(--hero);color:#fff;border-bottom-right-radius:6px;white-space:pre-wrap}
+.bubble.user{align-self:flex-end;background:var(--btn);color:var(--on-btn);border-bottom-right-radius:6px;white-space:pre-wrap}
 .bubble.model{align-self:flex-start;background:var(--card2);border-bottom-left-radius:6px}
 .bubble.err{background:var(--danger-soft);color:var(--danger)}
 .bubble p{margin:0 0 7px}.bubble p:last-child{margin:0}
@@ -447,7 +547,7 @@ canvas.confetti{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:n
              radial-gradient(520px 420px at 70% 105%,color-mix(in srgb,var(--carbs) 14%,transparent),transparent 70%),var(--bg)}
 .auth-card{width:100%;max-width:420px;position:relative}
 .auth-top{text-align:center;margin-bottom:22px}
-.auth-top .logo{width:68px;height:68px;border-radius:22px;font-size:32px;margin:0 auto 14px;box-shadow:0 14px 34px rgba(20,144,91,.38)}
+.auth-top .logo{width:76px;height:76px;border-radius:24px;font-size:32px;margin:0 auto 14px;box-shadow:0 14px 34px rgba(56,168,130,.35)}
 .auth-top h1{margin:0;font-size:32px;letter-spacing:-.045em;font-weight:800}
 .auth-top p{margin:8px 0 0;color:var(--muted);font-weight:600}
 .feat{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px}
@@ -467,17 +567,15 @@ canvas.confetti{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:n
 .splash{min-height:100dvh;display:grid;place-items:center}
 
 @media (max-width:560px){
-  .hero{flex-direction:column;align-items:stretch}
-  .ring{margin:0 auto}
-  .hero-side{flex-direction:row;flex-wrap:wrap;justify-content:space-between;align-items:flex-end}
+  .gauge{width:164px;height:100px}
+  .g-txt b{font-size:32px}
+  .gauge-side b{font-size:19px}
   .macros{grid-template-columns:1fr}
   .stats4{grid-template-columns:repeat(2,1fr)}
   .avg-grid{grid-template-columns:repeat(2,1fr)}
   .form3{grid-template-columns:1fr 1fr}
   .grid2{grid-template-columns:1fr}
   .cell .dk{display:none}
-  .fab{padding:0;width:56px;justify-content:center;border-radius:20px}
-  .fab b{display:none}
   .auth-box{padding:20px}
   .seg button{font-size:13px}
   dialog.sheet{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:28px 28px 0 0;max-height:94dvh}
@@ -493,7 +591,7 @@ canvas.confetti{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:n
 
 <div id="app" hidden>
   <header class="top"><div class="in">
-    <div class="brand"><i class="logo">N</i>NutriLog</div>
+    <div class="brand"><i class="logo"><svg viewBox="0 0 64 64" aria-hidden="true"><g transform="translate(0 3.5)"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="3.6" d="M30.5 25.5C29 16 33.5 8.5 44 6.5c1 10.5-4.5 17.5-13.5 19z"/><path stroke-width="3" d="M32 23.5c2.5-4.5 5.5-8 9.5-11"/><path stroke-width="3.6" d="M32 28.5c-5.5-3.6-12-4.8-19-3.6v22.5c7-1.2 13.5 0 19 3.6 5.5-3.6 12-4.8 19-3.6V24.9c-7-1.2-13.5 0-19 3.6z"/><path stroke-width="3.6" d="M32 28.5v22.5"/><path stroke-width="3.2" d="M18 32.5c3-.4 6 0 8.5 1M18 38.5c3-.4 6 0 8.5 1"/><path stroke-width="3.6" d="M37.5 38.5l3.5 3.5 6.5-7.5"/></g></g></svg></i>NutriLog</div>
     <div class="top-r">
       <span class="sync" id="sync" title="Συγχρονισμένο"></span>
       <span class="pill" id="streakPill" title="Τρέχον streak"></span>
@@ -501,11 +599,10 @@ canvas.confetti{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:n
     </div>
   </div></header>
   <main id="view"></main>
-  <button class="fab" data-act="chat" aria-label="Βοηθός Nutri"><span>✨</span><b>Βοηθός</b></button>
+  <button class="fab" data-act="chat" aria-label="Βοηθός Nutri" title="Βοηθός Nutri">✨</button>
   <nav class="tabbar"><div class="in">
     <button data-act="tab" data-tab="today"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg></span>Σήμερα</button>
     <button data-act="tab" data-tab="progress"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></span>Πρόοδος</button>
-    <button data-act="tab" data-tab="ai"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h2l2-2h4l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg></span>Σάρωση</button>
     <button data-act="tab" data-tab="settings"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>Προφίλ</button>
   </div></nav>
 </div>
@@ -515,6 +612,10 @@ canvas.confetti{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:n
 <dialog class="sheet" id="sugDlg"><div class="sheet-in" id="sugIn"></div></dialog>
 <dialog class="sheet" id="consentDlg"><div class="sheet-in" id="consentIn"></div></dialog>
 <dialog class="sheet" id="profDlg"><div class="sheet-in" id="profIn"></div></dialog>
+<dialog class="sheet tall" id="scanDlg"><div class="sheet-in" id="scanIn"></div></dialog>
+<dialog class="sheet" id="mealDlg"><div class="sheet-in" id="mealIn"></div></dialog>
+<dialog class="sheet" id="entryDlg"><div class="sheet-in" id="entryIn"></div></dialog>
+<dialog class="sheet tall" id="infoDlg"><div class="sheet-in" id="infoIn"></div></dialog>
 <input type="file" id="fileAvatar" accept="image/*" hidden>
 <dialog class="sheet tall" id="chatDlg"><div class="sheet-in">
   <div class="sheet-head">
@@ -679,6 +780,117 @@ const ACH=[
 const VAPID_PUBLIC='BPTYPxMAUPxSAoSJR3pBcJUMfKe9ZQA2S2A6jtCM6mdJXWvFlnmbq13xXSXNOMgIivHcl8cb5PkPg1rcZxNIGNk';
 const CONSENT_VERSION=1;
 
+/* ---------- Οδηγός θρεπτικών (γενικές πληροφορίες, όχι ιατρική συμβουλή) ---------- */
+const GUIDE={
+  kcal:{e:'🔥',t:'Ενέργεια (θερμίδες)',s:'Το «καύσιμο» του σώματος',
+    what:'Η ενέργεια που παίρνεις από το φαγητό. Τη δίνουν η πρωτεΐνη και οι υδατάνθρακες (4 kcal ανά γραμμάριο), τα λιπαρά (9 kcal/g) και το αλκοόλ (7 kcal/g).',
+    does:['Καλύπτει τον βασικό μεταβολισμό: αναπνοή, καρδιά, εγκέφαλο, θερμοκρασία','Τροφοδοτεί κάθε κίνηση και την άσκηση','Αν τρως λιγότερη ενέργεια από όση καις χάνεις βάρος· αν τρως περισσότερη, παίρνεις'],
+    src:'Όλα τα τρόφιμα. Πιο «πυκνά» σε θερμίδες είναι τα λάδια, οι ξηροί καρποί, τα γλυκά, τα τηγανητά και τα αναψυκτικά.',
+    need:()=>`Ο στόχος σου είναι <b>${r0(S.goals.kcal)} kcal</b> την ημέρα, υπολογισμένος από φύλο, ηλικία, ύψος, βάρος, δραστηριότητα και στόχο.`,
+    tip:'Μέτρα και τα «αόρατα»: λάδι μαγειρέματος, σάλτσες, ροφήματα. Μία κουταλιά της σούπας ελαιόλαδο έχει περίπου 90 kcal.'},
+  protein:{e:'🥩',t:'Πρωτεΐνη',s:'Μύες, χορτασμός, ανοσοποιητικό',
+    what:'Το δομικό υλικό του σώματος, φτιαγμένο από αμινοξέα. Κάποια από αυτά ο οργανισμός δεν μπορεί να τα φτιάξει και πρέπει να τα πάρει από το φαγητό.',
+    does:['Χτίζει και επιδιορθώνει μύες, δέρμα, μαλλιά και νύχια','Φτιάχνει ένζυμα, ορμόνες και αντισώματα για το ανοσοποιητικό','Χορταίνει περισσότερο από τα άλλα θρεπτικά, άρα βοηθά στην απώλεια βάρους','Προστατεύει τους μύες όταν τρως λιγότερες θερμίδες'],
+    src:'Κοτόπουλο, κρέας, ψάρι, αυγά, γιαούρτι, τυρί, γάλα, όσπρια (φακές, ρεβίθια, φασόλια), τόφου, ξηροί καρποί.',
+    need:()=>`Ο στόχος σου είναι <b>${r0(S.goals.protein)} g</b> (περίπου ${fmtN(r1(S.goals.protein/(+S.profile.weight||75)))} g ανά κιλό). Το ελάχιστο για ενήλικες είναι ~0,8 g/kg· όσοι γυμνάζονται ή χάνουν βάρος ωφελούνται από 1,6–2,2 g/kg.`,
+    tip:'Μοίρασέ τη σε όλα τα γεύματα (20–40 g το καθένα) αντί να τη μαζεύεις σε ένα βραδινό.'},
+  carbs:{e:'🍞',t:'Υδατάνθρακες',s:'Η κύρια πηγή γρήγορης ενέργειας',
+    what:'Χωρίζονται σε σύνθετους (άμυλο), απλούς (σάκχαρα) και φυτικές ίνες. Στο σώμα γίνονται γλυκόζη, το βασικό καύσιμο των κυττάρων.',
+    does:['Τροφοδοτούν τον εγκέφαλο και τους μύες','Αποθηκεύονται ως γλυκογόνο, την «μπαταρία» για την άσκηση','Οι σύνθετοι δίνουν σταθερή ενέργεια χωρίς απότομα σκαμπανεβάσματα'],
+    src:'Ψωμί και ζυμαρικά ολικής άλεσης, ρύζι, βρώμη, πατάτες, όσπρια, φρούτα, λαχανικά.',
+    need:()=>`Ο στόχος σου είναι <b>${r0(S.goals.carbs)} g</b>. Γενικά συστήνεται το 45–60% των θερμίδων να προέρχεται από υδατάνθρακες.`,
+    tip:'Προτίμησε ολικής άλεσης και όσπρια: έχουν περισσότερες ίνες και σε χορταίνουν για περισσότερη ώρα.'},
+  fat:{e:'🫒',t:'Λιπαρά',s:'Ορμόνες, βιταμίνες, εγκέφαλος',
+    what:'Πυκνή πηγή ενέργειας και απαραίτητο θρεπτικό συστατικό, όχι «εχθρός». Μετράει κυρίως το είδος τους.',
+    does:['Δίνουν απαραίτητα λιπαρά οξέα (ωμέγα-3, ωμέγα-6) που ο οργανισμός δεν φτιάχνει μόνος του','Βοηθούν να απορροφηθούν οι βιταμίνες A, D, E και K','Χρειάζονται για τις ορμόνες, τον εγκέφαλο και υγιή κύτταρα'],
+    src:'Τα καλά (ακόρεστα): ελαιόλαδο, ελιές, ξηροί καρποί, σπόροι, αβοκάντο, λιπαρά ψάρια (σολομός, σαρδέλες, σκουμπρί).',
+    need:()=>`Ο στόχος σου είναι <b>${r0(S.goals.fat)} g</b>, περίπου το 20–35% των θερμίδων σου.`,
+    tip:'Ψάρι δύο φορές την εβδομάδα καλύπτει τα ωμέγα-3. Το ελαιόλαδο είναι υγιεινό αλλά έχει πολλές θερμίδες, οπότε μέτρα το.'},
+  fiber:{e:'🌾',t:'Φυτικές ίνες',s:'Πέψη, χορτασμός, χοληστερόλη',
+    what:'Το μέρος των φυτικών τροφών που δεν διασπάται στο έντερο. Υπάρχουν διαλυτές (π.χ. βρώμη, όσπρια) και αδιάλυτες (π.χ. πίτουρο, λαχανικά).',
+    does:['Βελτιώνουν την πέψη και προλαμβάνουν τη δυσκοιλιότητα','Χορταίνουν και βοηθούν στον έλεγχο του βάρους','Σταθεροποιούν το σάκχαρο στο αίμα και ρίχνουν τη χοληστερόλη','«Ταΐζουν» τα καλά βακτήρια του εντέρου'],
+    src:'Όσπρια, λαχανικά, φρούτα με τη φλούδα, βρώμη, ψωμί ολικής άλεσης, ξηροί καρποί, σπόροι (λιναρόσπορος, chia).',
+    need:()=>`Ο στόχος σου είναι <b>${r0(S.goals.fiber)} g</b>. Οι ενήλικες χρειάζονται τουλάχιστον 25–30 g την ημέρα, και οι περισσότεροι τρώνε πολύ λιγότερες.`,
+    tip:'Αύξησέ τες σταδιακά και πίνε αρκετό νερό, αλλιώς μπορεί να νιώσεις φούσκωμα.'},
+  sugar:{e:'🍬',t:'Σάκχαρα',s:'Όριο, όχι στόχος',
+    what:'Απλοί υδατάνθρακες με γλυκιά γεύση. Στις ετικέτες τα «σάκχαρα» περιλαμβάνουν και τα φυσικά (φρούτα, γάλα) και τα πρόσθετα (ζάχαρη, μέλι, σιρόπια).',
+    does:['Δίνουν γρήγορη ενέργεια, αλλά τα πρόσθετα δεν έχουν άλλα θρεπτικά συστατικά','Η υπερβολή αυξάνει τον κίνδυνο για αύξηση βάρους, τερηδόνα και διαβήτη τύπου 2'],
+    src:'Πρόσθετα: ζάχαρη, μέλι, αναψυκτικά, χυμοί, γλυκά, δημητριακά πρωινού, σάλτσες. Φυσικά: φρούτα, γάλα, γιαούρτι.',
+    need:()=>`Το όριό σου είναι <b>${r0(S.goals.sugar)} g</b>. Ο ΠΟΥ συστήνει τα πρόσθετα σάκχαρα να μένουν κάτω από το 10% των θερμίδων, ιδανικά κάτω από το 5%.`,
+    tip:'Τα σάκχαρα από ολόκληρα φρούτα δεν είναι πρόβλημα. Πρόσεχε κυρίως τα ροφήματα και τα γλυκά.'},
+  satfat:{e:'🧈',t:'Κορεσμένα λιπαρά',s:'Να τα περιορίζεις',
+    what:'Είδος λιπαρών που συνήθως είναι στερεά σε θερμοκρασία δωματίου. Στην ετικέτα τα βρίσκεις ως «εκ των οποίων κορεσμένα», κάτω από τα λιπαρά.',
+    does:['Σε μεγάλες ποσότητες ανεβάζουν την «κακή» χοληστερόλη (LDL)','Αν τα αντικαταστήσεις με ακόρεστα (π.χ. ελαιόλαδο), προστατεύεις την καρδιά σου'],
+    src:'Βούτυρο, κρέμα γάλακτος, λιπαρά τυριά, λιπαρά κρέατα, αλλαντικά, φοινικέλαιο, λάδι καρύδας, γλυκά, κρουασάν.',
+    need:()=>`Όριο: κάτω από το 10% των θερμίδων, δηλαδή για σένα έως <b>${microTargets().satfat} g</b> την ημέρα.`,
+    tip:'Διάλεξε άπαχο κρέας, γαλακτοκομικά με λιγότερα λιπαρά και μαγείρευε με ελαιόλαδο αντί για βούτυρο.'},
+  sodium:{e:'🧂',t:'Νάτριο (αλάτι)',s:'Πίεση και κατακράτηση',
+    what:'Ορυκτό στοιχείο που παίρνουμε κυρίως από το αλάτι. 1 g αλάτι περιέχει 400 mg νάτριο.',
+    does:['Ρυθμίζει τα υγρά του σώματος και βοηθά νεύρα και μύες','Η υπερβολή ανεβάζει την αρτηριακή πίεση και τον κίνδυνο για καρδιά και εγκεφαλικό, και φέρνει κατακράτηση'],
+    src:'Κυρίως επεξεργασμένα τρόφιμα: αλλαντικά, τυριά (π.χ. φέτα), ψωμί, έτοιμα φαγητά, σνακ, σάλτσες, ελιές, και το αλάτι που προσθέτεις.',
+    need:()=>`Όριο: έως <b>2.000 mg νάτριο</b> την ημέρα, δηλαδή <b>5 g αλάτι</b> (περίπου ένα κουταλάκι του γλυκού).`,
+    tip:'Οι ευρωπαϊκές ετικέτες γράφουν «Αλάτι» σε g. Το NutriLog το μετατρέπει αυτόματα σε νάτριο (αλάτι × 400 = mg νατρίου).'},
+  calcium:{e:'🦴',t:'Ασβέστιο',s:'Οστά, δόντια, μύες',
+    what:'Το πιο άφθονο ορυκτό στοιχείο στο σώμα. Το 99% βρίσκεται στα οστά και στα δόντια.',
+    does:['Χτίζει και διατηρεί γερά οστά και δόντια','Χρειάζεται για τη σύσπαση των μυών, τον καρδιακό ρυθμό και την πήξη του αίματος'],
+    src:'Γάλα, γιαούρτι, τυρί, σαρδέλες (με τα κόκαλα), ταχίνι, αμύγδαλα, μπρόκολο, φυτικά ροφήματα εμπλουτισμένα με ασβέστιο.',
+    need:()=>`Για σένα περίπου <b>${fmtN(microTargets().calcium)} mg</b> την ημέρα.`,
+    tip:'Η βιταμίνη D (ήλιος, λιπαρά ψάρια, αυγά) βοηθά τον οργανισμό να απορροφά το ασβέστιο.'},
+  iron:{e:'🩸',t:'Σίδηρος',s:'Οξυγόνο στο αίμα, ενέργεια',
+    what:'Ορυκτό στοιχείο απαραίτητο για το αίμα. Από ζωικές τροφές απορροφάται πολύ πιο εύκολα απ’ ό,τι από φυτικές.',
+    does:['Φτιάχνει την αιμοσφαιρίνη, που μεταφέρει οξυγόνο σε όλο το σώμα','Η έλλειψή του φέρνει κούραση, ζαλάδα, χλωμάδα και αναιμία'],
+    src:'Κόκκινο κρέας, συκώτι, θαλασσινά, όσπρια, σπανάκι, βρώμη, δημητριακά εμπλουτισμένα με σίδηρο.',
+    need:()=>`Για σένα περίπου <b>${microTargets().iron} mg</b> την ημέρα. Οι γυναίκες έως 50 ετών χρειάζονται περισσότερο λόγω περιόδου.`,
+    tip:'Βάλε βιταμίνη C στο ίδιο γεύμα (λεμόνι, πιπεριά, ντομάτα) για καλύτερη απορρόφηση. Καφές και τσάι μαζί με το φαγητό τη μειώνουν.'},
+  potassium:{e:'🍌',t:'Κάλιο',s:'Πίεση, καρδιά, μύες',
+    what:'Ορυκτό στοιχείο-ηλεκτρολύτης, το «αντίβαρο» του νατρίου στον οργανισμό.',
+    does:['Βοηθά να μένει χαμηλά η αρτηριακή πίεση','Χρειάζεται για τον ρυθμό της καρδιάς και τη λειτουργία μυών και νεύρων','Μειώνει τις κράμπες'],
+    src:'Μπανάνα, πατάτα, γλυκοπατάτα, όσπρια, σπανάκι, ντομάτα, αβοκάντο, γιαούρτι, ξηροί καρποί.',
+    need:()=>`Για σένα περίπου <b>${fmtN(microTargets().potassium)} mg</b> την ημέρα.`,
+    tip:'Αν έχεις πρόβλημα στα νεφρά ή παίρνεις φάρμακα για την πίεση, ρώτα τον γιατρό σου πριν αυξήσεις πολύ το κάλιο.'},
+  vitc:{e:'🍊',t:'Βιταμίνη C',s:'Ανοσοποιητικό, κολλαγόνο',
+    what:'Υδατοδιαλυτή βιταμίνη που ο οργανισμός δεν αποθηκεύει, οπότε τη χρειάζεσαι κάθε μέρα.',
+    does:['Ισχυρό αντιοξειδωτικό που στηρίζει το ανοσοποιητικό','Φτιάχνει κολλαγόνο για δέρμα, αρθρώσεις και επούλωση πληγών','Βοηθά στην απορρόφηση του σιδήρου'],
+    src:'Πιπεριές, ακτινίδιο, πορτοκάλι, λεμόνι, φράουλες, μπρόκολο, ντομάτα.',
+    need:()=>`Για σένα περίπου <b>${microTargets().vitc} mg</b> την ημέρα. Ένα ακτινίδιο ή μισή κόκκινη πιπεριά αρκούν.`,
+    tip:'Καταστρέφεται με το πολύ βράσιμο, γι’ αυτό τρώγε φρούτα και λαχανικά και ωμά.'},
+  water:{e:'💧',t:'Νερό',s:'Ενυδάτωση και συγκέντρωση',
+    what:'Περίπου το 60% του σώματός σου είναι νερό, και χάνεις κάθε μέρα με την αναπνοή, τον ιδρώτα και τα ούρα.',
+    does:['Ρυθμίζει τη θερμοκρασία του σώματος','Μεταφέρει θρεπτικά συστατικά και βοηθά τα νεφρά να αποβάλλουν τις άχρηστες ουσίες','Ακόμα και μικρή αφυδάτωση φέρνει κούραση, πονοκέφαλο και κακή συγκέντρωση'],
+    src:'Νερό, αλλά και ροφήματα, γάλα, σούπες, φρούτα και λαχανικά (π.χ. καρπούζι, αγγούρι).',
+    need:()=>`Ο στόχος σου είναι <b>${fmtL(S.goals.water)} L</b> την ημέρα (περίπου 35 ml ανά κιλό). Χρειάζεσαι περισσότερο όταν κάνει ζέστη ή γυμνάζεσαι.`,
+    tip:'Κράτα ένα μπουκάλι κοντά σου. Ανοιχτόχρωμα ούρα σημαίνουν καλή ενυδάτωση.'}
+};
+const GUIDE_GROUPS=[['Μακροθρεπτικά',['kcal','protein','carbs','fat','fiber']],['Να τα περιορίζεις',['sugar','satfat','sodium']],['Βιταμίνες & μέταλλα',['calcium','iron','potassium','vitc']],['Υγρά',['water']]];
+const ACCURACY_GUIDE=`<p>Μικρά λάθη κάθε μέρα αθροίζονται. Αυτά κάνουν τη μεγαλύτερη διαφορά:</p>
+  <h5>Ποιον τρόπο να διαλέξεις</h5>
+  <ul><li><b>🧾 Ετικέτα</b>: οι τιμές της συσκευασίας ακριβώς όπως είναι τυπωμένες. Το πιο ακριβές για συσκευασμένα προϊόντα.</li>
+  <li><b>🏷️ Barcode</b>: το πιο γρήγορο, αλλά οι τιμές προέρχονται από την κοινότητα του Open Food Facts και σπάνια διαφέρουν από τη συσκευασία σου.</li>
+  <li><b>🔎 Αναζήτηση</b>: μέσες τιμές για απλά τρόφιμα (φρούτα, κρέας, ρύζι, γιαούρτι).</li>
+  <li><b>📸 Πιάτο (AI)</b>: εκτίμηση με απόκλιση περίπου ±20–30%. Ιδανικό για φαγητό έξω ή σπιτικά πιάτα· διόρθωσε τα γραμμάρια αν τα ξέρεις.</li></ul>
+  <h5>Συχνά λάθη</h5>
+  <ul><li><b>Ποσότητα «με το μάτι»</b>: συνήθως την υπολογίζουμε λιγότερη. Ζύγισε τουλάχιστον τις πρώτες εβδομάδες, μέχρι να μάθεις τις μερίδες σου.</li>
+  <li><b>Ωμό ή μαγειρεμένο</b>: ρύζι και ζυμαρικά παίρνουν 2–3 φορές το βάρος τους με το βράσιμο, ενώ το κρέας χάνει περίπου το 25%. Διάλεξε το τρόφιμο που ταιριάζει με αυτό που ζύγισες.</li>
+  <li><b>Λάδι και σάλτσες</b>: μία κουταλιά της σούπας ελαιόλαδο έχει περίπου 90 kcal και είναι το πιο συχνό «κρυφό» κομμάτι.</li>
+  <li><b>Ροφήματα και τσιμπολογήματα</b>: χυμοί, καφέδες με ζάχαρη, αλκοόλ και μια χούφτα ξηρούς καρπούς μετράνε κι αυτά.</li>
+  <li><b>Καταγραφή από μνήμης</b>: γράψε το γεύμα αμέσως μετά το φαγητό, όχι το βράδυ.</li></ul>
+  <div class="note" style="margin-top:10px">⏱️ Για να γλιτώνεις χρόνο: <b>⭐ Αποθήκευση γεύματος</b> για όσα τρως συχνά, <b>↺ Όπως χθες</b> για επαναλαμβανόμενα γεύματα, και το <b>+</b> στα «Πρόσφατα» για την ίδια ποσότητα με την τελευταία φορά.</div>`;
+const LABEL_GUIDE=`<p>Ο πίνακας «Διατροφικά στοιχεία» είναι υποχρεωτικός σε κάθε συσκευασμένο τρόφιμο στην ΕΕ. Να τι σημαίνει κάθε κομμάτι:</p>
+  <ul><li><b>Ανά 100 g / 100 ml</b>: για να συγκρίνεις προϊόντα μεταξύ τους.</li>
+  <li><b>Ανά μερίδα</b>: ό,τι τρως πραγματικά. Έλεγξε πόσα γραμμάρια λογαριάζει ο κατασκευαστής ως μερίδα, συχνά είναι λιγότερα απ’ όσα τρώμε.</li>
+  <li><b>Ενέργεια</b>: γράφεται σε kJ και kcal. Το NutriLog μετρά kcal.</li>
+  <li><b>«εκ των οποίων κορεσμένα / σάκχαρα»</b>: είναι μέρος των λιπαρών και των υδατανθράκων, όχι επιπλέον ποσότητα.</li>
+  <li><b>Αλάτι</b>: σε g. Αλάτι × 400 = mg νατρίου.</li>
+  <li><b>% ΠΑ</b>: τι ποσοστό καλύπτει από την «Προσλαμβανόμενη Αναφορά» ενός μέσου ενήλικα (2.000 kcal), όχι από τους δικούς σου στόχους.</li>
+  <li><b>Συστατικά</b>: γράφονται με σειρά ποσότητας. Το πρώτο υπάρχει σε μεγαλύτερη ποσότητα.</li></ul>
+  <h5>Γρήγορος κανόνας ανά 100 g</h5>
+  <ul><li>Σάκχαρα: χαμηλά ≤ 5 g · υψηλά > 22,5 g</li><li>Λιπαρά: χαμηλά ≤ 3 g · υψηλά > 17,5 g</li><li>Κορεσμένα: χαμηλά ≤ 1,5 g · υψηλά > 5 g</li><li>Αλάτι: χαμηλό ≤ 0,3 g · υψηλό > 1,5 g</li></ul>
+  <div class="note" style="margin-top:10px">🧾 Με τη <b>Σάρωση → Ετικέτα</b> το NutriLog διαβάζει τις τιμές ακριβώς όπως είναι τυπωμένες στη συσκευασία.</div>`;
+/* Γραμμές της διατροφικής ετικέτας (σειρά όπως στις ευρωπαϊκές συσκευασίες) */
+const LROWS=[['energy_kj','Ενέργεια','kJ'],['energy_kcal','Ενέργεια','kcal'],['fat','Λιπαρά','g'],['satfat','εκ των οποίων κορεσμένα','g',1],['carbs','Υδατάνθρακες','g'],['sugar','εκ των οποίων σάκχαρα','g',1],['fiber','Φυτικές ίνες','g'],['protein','Πρωτεΐνες','g'],['salt','Αλάτι','g'],
+  ['sodium','Νάτριο','mg'],['calcium','Ασβέστιο','mg'],['iron','Σίδηρος','mg'],['potassium','Κάλιο','mg'],['vitc','Βιταμίνη C','mg']];
+const LBK=LROWS.map(r=>r[0]);
+
 /* ---------- Backend (Supabase) ---------- */
 const CFG=window.NUTRILOG_CONFIG||{};
 const APP_URL=location.origin+location.pathname.replace(/index\.html$/,'');
@@ -711,7 +923,8 @@ let tab='today',curDate=new Date();
 let prog={view:'week',anchor:new Date()};
 let add={meal:'breakfast',tab:'search',q:'',sel:null,grams:100,off:null,scan:null};
 let addList=[];
-let ai={img:null,b64:null,desc:'',loading:false,error:'',result:null,meal:guessMeal()};
+let ai={mode:'meal',img:null,b64:null,desc:'',loading:false,error:'',result:null,label:null,meal:guessMeal(),day:'',code:''};
+let setPage='',ed=null;
 let models={list:null,auto:'',loading:false,err:''},lastModel='';
 let chat={msgs:[],busy:false};
 let sug={meal:guessMeal(),wish:'',loading:false,error:'',result:null};
@@ -720,7 +933,9 @@ let rvBusy=false,wiz=null,scanner=null,celQueue=[];
 /* ---------- Βοηθητικά ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const r0=n=>Math.round(n||0), r1=n=>Math.round((n||0)*10)/10;
+const r0=n=>Math.round(n||0), r1=n=>Math.round((n||0)*10)/10, r2=n=>Math.round((n||0)*100)/100;
+const fmtN=n=>String(n).replace('.',',');
+const openAttr=id=>{try{return sessionStorage.getItem('open-'+id)==='1'?'open':''}catch(e){return''}};
 const pad=n=>String(n).padStart(2,'0');
 const dk=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const pk=k=>{const[y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d)};
@@ -751,7 +966,7 @@ function totals(k){const t={kcal:0,protein:0,carbs:0,fat:0,fiber:0,sugar:0};cons
 function microTotals(k){const t={},d=S.days[k],es=(d&&d.entries)||[];let known=0;MK.forEach(n=>t[n]=0);
   for(const e of es){if(MK.some(n=>e[n]!=null))known++;for(const n of MK)t[n]+=+e[n]||0}return{t,known,total:es.length}}
 function microTargets(){const p=S.profile,f=p.sex==='f',a=+p.age;
-  return{sodium:2300,satfat:Math.round(S.goals.kcal*0.1/9),calcium:(f&&a>50)||a>70?1200:1000,iron:f&&a<51?18:8,potassium:f?2600:3400,vitc:f?75:90}}
+  return{sodium:2000,satfat:Math.round(S.goals.kcal*0.1/9),calcium:(f&&a>50)||a>70?1200:1000,iron:f&&a<51?18:8,potassium:f?2600:3400,vitc:f?75:90}}
 function status(k){
   const fr=!!S.freezes[k];
   if(!hasE(k))return fr?'freeze':'none';
@@ -775,12 +990,21 @@ function streaks(){
 function freezesInMonth(k){const ym=k.slice(0,7);return Object.keys(S.freezes).filter(x=>x.startsWith(ym)).length}
 function canFreeze(k){return k<todayK()&&status(k)!=='hit'&&status(k)!=='freeze'&&freezesInMonth(k)===0}
 function achStats(){const st=streaks();let ai=0,barcode=0,water=0,prot=0;
-  for(const k of Object.keys(S.days)){const d=S.days[k];for(const e of d.entries||[]){if(e.src==='ai')ai++;if(e.src==='barcode')barcode++}
+  for(const k of Object.keys(S.days)){const d=S.days[k];for(const e of d.entries||[]){if(e.src==='ai'||e.src==='label')ai++;if(e.src==='barcode')barcode++}
     if((d.water||0)>=S.goals.water)water++;if(hasE(k)&&totals(k).protein>=S.goals.protein)prot++}
   return{...st,ai,barcode,water,prot,saved:S.savedMeals.length}}
 function dayObj(k){if(!S.days[k])S.days[k]={entries:[],water:0};if(!S.days[k].entries)S.days[k].entries=[];return S.days[k]}
 function addEntry(k,e){dayObj(k).entries.push({id:uid(),...e});save()}
 function scaled(per,g){const o={};for(const n of ALLK)if(per[n]!=null&&per[n]!=='')o[n]=r1((+per[n]||0)*g/100);return o}
+/* Τιμές τροφίμου για g γραμμάρια. Αν το τρόφιμο έχει τις τιμές «ανά μερίδα» από την ετικέτα και
+   η ποσότητα είναι ακέραιες μερίδες, χρησιμοποιούνται αυτές αυτούσιες (όπως είναι τυπωμένες). */
+function foodVals(f,g){
+  if(f.srv&&f.portion>0&&g>0){const n=g/f.portion,m=Math.round(n);
+    if(m>=1&&Math.abs(n-m)<1e-9){const o={};for(const k of ALLK)if(f.srv[k]!=null)o[k]=r2(f.srv[k]*m);return o}}
+  return scaled(f.per,g);
+}
+function entrySrc(f){if(f.src==='barcode'||f.src==='off')return f.src;if(['barcode','off','label'].includes(f.osrc))return f.osrc;return f.label?'label':'db'}
+const SRC_TAG={ai:'AI',barcode:'🏷️',off:'🏷️',label:'🧾'};
 function itemToEntry(it,meal,src){const g=+it.grams||0,o={meal,name:String(it.name||'Τρόφιμο').slice(0,80),grams:g,src};
   ALLK.forEach(n=>{if(it[n]!=null)o[n]=r1(+it[n]||0)});if(g>0){o.per={};ALLK.forEach(n=>{if(it[n]!=null)o.per[n]=r1((+it[n]||0)/g*100)})}return o}
 function statusText(k){const st=status(k);if(st==='none')return['none','Καμία καταγραφή'];if(st==='hit')return['hit','✓ Εντός στόχου'];if(st==='freeze')return['freeze','❄️ Πάγωμα streak'];return['miss',totals(k).kcal<S.goals.kcal?'Κάτω από τον στόχο':'Πάνω από τον στόχο']}
@@ -878,6 +1102,9 @@ async function demoAI(b){
   if(b.action==='models')return{models:['gemini-3.8-flash','gemini-3.8-flash-lite','gemini-3.5-pro'],auto:'gemini-3.8-flash'};
   if(b.action==='chat')return{text:'(Demo) Κατάλαβα, να το καταγράψω;',actions:[{type:'log_food',meal:'breakfast',day:'today',items:[it('Αυγά',100,143,12.6,0.7,9.5),it('Ψωμί ολικής',30,74,3.9,12,1)]}],model:'demo'};
   if(b.action==='suggest')return{result:{intro:'(Demo) Σου μένουν ~600 kcal.',suggestions:[{title:'Γιαούρτι με μέλι',why:'Πολλή πρωτεΐνη',items:[it('Γιαούρτι 2%',200,146,20,7,4),it('Μέλι',15,46,0,12,0)]},{title:'Τοστ ολικής',why:'Γρήγορο',items:[it('Τοστ',150,420,21,40,19)]},{title:'Σαλάτα τόνου',why:'Ελαφρύ',items:[it('Τόνος',80,93,21,0,1),it('Σαλάτα',150,40,2,6,1)]}]},model:'demo'};
+  if(b.action==='label'){const v=(kj,kc,f,sf,c,s,fi,p,sa)=>({energy_kj:kj,energy_kcal:kc,fat:f,satfat:sf,carbs:c,sugar:s,fiber:fi,protein:p,salt:sa,sodium:null,calcium:null,iron:null,potassium:null,vitc:null});
+    return{kind:'label',result:{is_label:true,product:'Μπάρα βρώμης με σοκολάτα (demo)',unit:'g',per100:v(1849,441,17.2,6.1,58.3,24.6,6.8,9.1,0.28),has_serving:true,serving_label:'1 μπάρα (40 g)',serving_size:40,per_serving:v(740,176,6.9,2.4,23.3,9.8,2.7,3.6,0.11),package_size:160,
+      lines:['Ενέργεια 1849 kJ / 441 kcal | 740 kJ / 176 kcal','Λιπαρά 17,2 g | 6,9 g','εκ των οποίων κορεσμένα 6,1 g | 2,4 g','Υδατάνθρακες 58,3 g | 23,3 g','εκ των οποίων σάκχαρα 24,6 g | 9,8 g','Φυτικές ίνες 6,8 g | 2,7 g','Πρωτεΐνες 9,1 g | 3,6 g','Αλάτι 0,28 g | 0,11 g'],notes:''},model:'demo'}}
   if(b.action==='review')return{result:{headline:'💪 Καλή εβδομάδα (demo)',score:72,summary:'Δοκιμαστική ανασκόπηση.',wins:['Σταθερή καταγραφή'],improve:['Περισσότερο νερό'],next_goal:'5 μέρες εντός στόχου'},model:'demo'};
   return{result:{is_food:true,dish:'Κοτόπουλο με ρύζι (demo)',items:[it('Ρύζι',150,195,4,42,0.5),it('Κοτόπουλο',120,198,37,0,4.3)],confidence:'medium',notes:'Δοκιμαστικό αποτέλεσμα.'},model:'demo'};
 }
@@ -908,7 +1135,7 @@ function modelBox(){
 }
 
 /* ---------- Open Food Facts ---------- */
-const OFF_FIELDS='code,product_name,product_name_el,brands,nutriments,serving_quantity';
+const OFF_FIELDS='code,product_name,product_name_el,brands,nutriments,serving_quantity,nutriscore_grade';
 function offToFood(p,src){
   const n=p.nutriments||{},g=k=>{const v=n[k+'_100g'];return v==null||v===''||isNaN(+v)?null:+v};
   let kcal=g('energy-kcal');if(kcal==null){const kj=g('energy-kj')??g('energy');if(kj!=null)kcal=kj/4.184}
@@ -921,7 +1148,8 @@ function offToFood(p,src){
   const brand=String(p.brands||'').split(',')[0].trim();
   const name=String(p.product_name_el||p.product_name||'Προϊόν').trim()+(brand?` · ${brand}`:'');
   const sq=+p.serving_quantity;
-  return{name:name.slice(0,80),per,portion:sq>0&&sq<2000?Math.round(sq):100,plabel:'μερίδα',src,code:p.code};
+  const ns=/^[a-e]$/.test(p.nutriscore_grade||'')?p.nutriscore_grade:'';
+  return{name:name.slice(0,80),per,portion:sq>0&&sq<2000?Math.round(sq):100,plabel:'μερίδα',src,code:p.code,ns};
 }
 async function offProduct(code){
   const r=await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=${OFF_FIELDS}`);
@@ -1045,7 +1273,7 @@ function renderAuth(view){
     </form>${msg}`;
   }
   $('#auth').innerHTML=`<div class="auth-wrap"><div class="auth-card">
-    <div class="auth-top"><i class="logo">N</i><h1>NutriLog</h1><p>Μέτρα θερμίδες, κράτα το streak σου και ανέλυσε τα γεύματά σου με AI.</p>
+    <div class="auth-top"><i class="logo"><svg viewBox="0 0 64 64" aria-hidden="true"><g transform="translate(0 3.5)"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="3.6" d="M30.5 25.5C29 16 33.5 8.5 44 6.5c1 10.5-4.5 17.5-13.5 19z"/><path stroke-width="3" d="M32 23.5c2.5-4.5 5.5-8 9.5-11"/><path stroke-width="3.6" d="M32 28.5c-5.5-3.6-12-4.8-19-3.6v22.5c7-1.2 13.5 0 19 3.6 5.5-3.6 12-4.8 19-3.6V24.9c-7-1.2-13.5 0-19 3.6z"/><path stroke-width="3.6" d="M32 28.5v22.5"/><path stroke-width="3.2" d="M18 32.5c3-.4 6 0 8.5 1M18 38.5c3-.4 6 0 8.5 1"/><path stroke-width="3.6" d="M37.5 38.5l3.5 3.5 6.5-7.5"/></g></g></svg></i><h1>NutriLog</h1><p>Μέτρα θερμίδες, κράτα το streak σου και ανέλυσε τα γεύματά σου με AI.</p>
       <div class="feat"><span>🔥 Streak</span><span>📸 AI σάρωση</span><span>🏷️ Barcode</span><span>☁️ Σε όλες τις συσκευές</span></div></div>
     <div class="auth-box">${box}</div>
     <div class="auth-foot">Συνεχίζοντας αποδέχεσαι τους <a href="terms.html">Όρους Χρήσης</a> και την <a href="privacy.html">Πολιτική Απορρήτου</a>. Τα δεδομένα σου τα βλέπεις μόνο εσύ.</div>
@@ -1104,7 +1332,7 @@ async function startApp(){
   if(S.settings.reminders.enabled)ensurePushSub(false).catch(()=>{});
 }
 function onSignedOut(){stopScanner();user=null;appUid=null;S=defState();chat.msgs=[];models={list:null,auto:'',loading:false,err:''};
-  ['#dlg','#wizDlg','#chatDlg','#sugDlg','#consentDlg','#profDlg'].forEach(s=>{const d=$(s);if(d.open)d.close()});applyTheme('auto');renderAuth('signin')}
+  ['#dlg','#wizDlg','#chatDlg','#sugDlg','#consentDlg','#profDlg','#scanDlg','#mealDlg','#entryDlg','#infoDlg'].forEach(s=>{const d=$(s);if(d.open)d.close()});applyTheme('auto');renderAuth('signin')}
 
 /* ---------- Render ---------- */
 function render(){
@@ -1113,85 +1341,71 @@ function render(){
   const v=$('#view');
   if(tab==='today')v.innerHTML=renderToday();
   else if(tab==='progress')v.innerHTML=renderProgress();
-  else if(tab==='ai')v.innerHTML=renderAI();
-  else v.innerHTML=renderSettings();
+  else v.innerHTML=setPage==='more'?renderMore():renderSettings();
   updateTop();
+  if(mealOpen&&$('#mealDlg').open)renderMeal();
 }
 function updateTop(){const s=streaks();$('#streakPill').innerHTML=`🔥 ${s.cur}`;$('#streakPill').title=`Τρέχον streak: ${s.cur} ${s.cur===1?'μέρα':'μέρες'}`;$('#avatarBtn').innerHTML=avatarHtml();setSync(syncState)}
 
 function bar(n,val,goal,unit){
   const pct=goal?Math.min(100,val/goal*100):0,over=LIMITS.has(n)&&val>goal;
-  return`<div class="mbar"><div class="lbl"><b>${NL[n]}${LIMITS.has(n)?' <span class="small">(όριο)</span>':''}</b><span>${unit==='mg'||val>=100?r0(val):r1(val)} / ${r0(goal)} ${unit||'g'}</span></div>
+  return`<div class="mbar"><div class="lbl"><b>${NL[n]}${LIMITS.has(n)?' <span class="small">(όριο)</span>':''}<button class="ninfo" data-act="info" data-n="${n}" aria-label="Τι είναι: ${NL[n]}">ⓘ</button></b><span>${unit==='mg'||val>=100?r0(val):r1(val)} / ${r0(goal)} ${unit||'g'}</span></div>
   <div class="track"><div class="fill" style="width:${pct}%;background:${over?'var(--danger)':NC[n]}"></div></div></div>`;
 }
 
 const MEAL_TINT={breakfast:'var(--carbs)',lunch:'var(--accent)',dinner:'var(--sugar)',snack:'var(--fat)'};
-function miniRing(n,val,goal){
-  const r=26,C=2*Math.PI*r,f=goal?Math.min(val/goal,1):0,pct=goal?r0(val/goal*100):0;
-  return`<div class="mini"><div class="mr"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="${r}" fill="none" stroke="var(--none)" stroke-width="7"/><circle cx="32" cy="32" r="${r}" fill="none" stroke="${NC[n]}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${f*C} ${C}" ${f?'':'style="display:none"'}/></svg><span>${pct}%</span></div>
-    <b>${r0(val)}<span class="muted" style="font-weight:650;font-size:12.5px"> / ${r0(goal)} g</span></b><small>${NL[n]}</small></div>`;
-}
 function renderToday(){
   const k=dk(curDate),t=totals(k),g=S.goals,d=S.days[k]||{},tol=(+S.settings.tolerance||10)/100;
   const isToday=k===todayK();
-  const C=2*Math.PI*64,frac=g.kcal?Math.min(t.kcal/g.kcal,1):0,over=t.kcal>g.kcal*(1+tol),remain=g.kcal-t.kcal;
+  const over=t.kcal>g.kcal*(1+tol),remain=g.kcal-t.kcal;
   const [sc,stxt]=statusText(k);
   const water=d.water||0,glasses=Math.max(1,Math.round(g.water/250)),on=Math.round(water/250);
-  let h=isToday?`<div class="greet">${greeting()}, ${esc(firstName())} 👋</div><div class="greet-sub">${cap(fmtDate(curDate,{weekday:'long',day:'numeric',month:'long'}))}</div>`:'';
-  h+=`<section class="datebar">
-    <button class="icon-btn" data-act="day" data-d="-1" aria-label="Προηγούμενη μέρα">‹</button>
-    <div class="date-title"><strong>${isToday?'Σήμερα':cap(fmtDate(curDate,{weekday:'long'}))}</strong><span>${fmtDate(curDate,{day:'numeric',month:'long',year:'numeric'})}</span></div>
-    <button class="icon-btn" data-act="day" data-d="1" ${isToday?'disabled':''} aria-label="Επόμενη μέρα">›</button></section>`;
+  let h=`<div class="hdr"><div>${isToday
+      ?`<div class="greet">${greeting()}, ${esc(firstName())} 👋</div><div class="greet-sub">${cap(fmtDate(curDate,{weekday:'long',day:'numeric',month:'long'}))}</div>`
+      :`<div class="greet">${cap(fmtDate(curDate,{weekday:'long'}))}</div><div class="greet-sub">${fmtDate(curDate,{day:'numeric',month:'long',year:'numeric'})}</div>`}</div>
+    <div class="daynav"><button data-act="day" data-d="-1" aria-label="Προηγούμενη μέρα">‹</button>${isToday?'':'<button class="lbl" data-act="day" data-d="0">Σήμερα</button>'}<button data-act="day" data-d="1" ${isToday?'disabled':''} aria-label="Επόμενη μέρα">›</button></div></div>`;
   if(isToday){
     const y=dk(addDays(new Date(),-1)),chain=chainEnding(addDays(new Date(),-2));
     if(canFreeze(y)&&chain>0)h+=`<div class="tip ice"><span class="e">❄️</span><div><b>Χθες χάθηκε ο στόχος</b><br><span class="muted">Χρησιμοποίησε το πάγωμα του μήνα για να σώσεις το streak των ${chain} ${chain===1?'ημέρας':'ημερών'}.</span></div><button class="btn primary" data-act="freeze" data-k="${y}">Πάγωμα</button></div>`;
-    if(!(d.entries||[]).length)h+=`<div class="tip"><span class="e">🍽️</span><div><b>Ξεκίνα την καταγραφή σου</b><br><span class="muted">Πάτα «+ Προσθήκη» σε ένα γεύμα, σκάναρε barcode ή βγάλε φωτογραφία το πιάτο σου.</span></div><button class="btn primary" data-act="tab" data-tab="ai" aria-label="Σάρωση">📸</button></div>`;
-  }
+  }else if(canFreeze(k))h+=`<div class="tip ice"><span class="e">❄️</span><div><b>Πάγωμα streak</b><br><span class="muted">Σώσε το streak σου για αυτή τη μέρα (1 τον μήνα).</span></div><button class="btn" data-act="freeze" data-k="${k}">Πάγωμα</button></div>`;
+  else if(S.freezes[k]&&status(k)==='freeze')h+=`<div class="tip ice"><span class="e">❄️</span><div><b>Παγωμένη μέρα</b><br><span class="muted">Το streak σου συνεχίζεται κανονικά.</span></div><button class="btn" data-act="unfreeze" data-k="${k}">Αναίρεση</button></div>`;
+  // Ημικύκλιο: μήκος τόξου π·r
+  const AR=Math.PI*80,fr=g.kcal?Math.min(t.kcal/g.kcal,1):0;
   h+=`<section class="card hero">
-    <div class="ring"><svg viewBox="0 0 160 160"><circle cx="80" cy="80" r="64" class="ring-bg"/><circle cx="80" cy="80" r="64" class="ring-fg ${over?'over':''}" ${frac?'':'style="display:none"'} stroke-dasharray="${frac*C} ${C}" transform="rotate(-90 80 80)"/></svg>
-      <div class="ring-txt"><b>${r0(t.kcal)}</b><span>από ${r0(g.kcal)} kcal</span></div></div>
-    <div class="hero-side">
-      <div class="stat"><span>${remain>=0?'Υπόλοιπο':'Υπέρβαση'}</span><b class="${remain<0?'neg':''}">${r0(Math.abs(remain))} kcal</b></div>
-      <div class="stat"><span>Εύρος στόχου</span><b style="font-size:16px">${r0(g.kcal*(1-tol))}–${r0(g.kcal*(1+tol))}</b></div>
-      <span class="badge ${sc}">${stxt}</span>
+    <div class="gauge-row">
+      <div class="gauge-side"><b>${r0(t.kcal)}</b><span>Φαγητό</span></div>
+      <div class="gauge"><svg viewBox="0 0 200 116" aria-hidden="true"><path class="g-bg" d="M20 104 A80 80 0 0 1 180 104"/><path class="g-fg ${over?'over':''}" d="M20 104 A80 80 0 0 1 180 104" stroke-dasharray="${fr*AR} ${AR}" ${fr?'':'style="display:none"'}/></svg>
+        <div class="g-txt"><b>${r0(Math.abs(remain))}</b><span>${remain>=0?'υπόλοιπο kcal':'υπέρβαση kcal'}</span></div></div>
+      <div class="gauge-side"><b>${r0(g.kcal)}</b><span>Στόχος</span></div>
     </div>
-  </section>
-  <div class="minis">${['protein','carbs','fat'].map(n=>miniRing(n,t[n],g[n])).join('')}</div>
-  <section class="card"><div class="macros">${['fiber','sugar'].map(n=>bar(n,t[n],g[n])).join('')}</div></section>`;
-  if(isToday)h+=`<div class="qa">${[['scanFromAI','🏷️','Barcode','var(--protein)'],['tab','📸','Φωτογραφία','var(--accent)','ai'],['suggest','💡','Τι να φάω;','var(--carbs)'],['chat','💬','Πες τι έφαγες','var(--sugar)']]
-    .map(([act,ic,l,c,t])=>`<button data-act="${act}"${t?` data-tab="${t}"`:''}><span class="qi" style="background:color-mix(in srgb,${c} 16%,var(--card))">${ic}</span>${l}</button>`).join('')}</div>`;
-  const mt=microTotals(k),tg=microTargets();
-  h+=`<details class="card" id="microCard" ${sessionStorage.getItem('microOpen')==='1'?'open':''}><summary>🧪 Μικροθρεπτικά</summary>
-    ${mt.total?`<div class="macros">${MK.map(n=>bar(n,mt.t[n],tg[n],NU[n])).join('')}</div>
-    <div class="small muted" style="margin-top:10px">Από ${mt.known} στα ${mt.total} τρόφιμα της ημέρας υπάρχουν στοιχεία μικροθρεπτικών. Οι στόχοι είναι οι γενικές συστάσεις για ενήλικες.</div>`
-    :'<p class="muted small" style="margin:0">Κατέγραψε τρόφιμα για να δεις νάτριο, ασβέστιο, σίδηρο, κάλιο και βιταμίνη C.</p>'}</details>
-  <section class="grid2 mb">
-    <div class="card water"><h3>💧 Νερό</h3>
-      <div class="water-row"><button class="icon-btn" data-act="water" data-v="-250" aria-label="Λιγότερο νερό">−</button>
-      <div class="water-val"><b>${(water/1000).toFixed(2).replace('.',',')} L</b><div class="small muted">στόχος ${fmtL(g.water)} L</div></div>
-      <button class="icon-btn" data-act="water" data-v="250" aria-label="Περισσότερο νερό">+</button></div>
-      <div class="drops">${Array.from({length:Math.min(glasses,16)},(_,i)=>`<span class="drop ${i<on?'on':''}"></span>`).join('')}</div>
-    </div>
-    <div class="card"><h3>⚖️ Βάρος</h3>
-      <div class="row"><input type="number" step="0.1" min="20" max="400" inputmode="decimal" placeholder="π.χ. 74,5" value="${d.weight??''}" data-weight="${k}"><span class="muted">kg</span></div>
-      <div class="small muted" style="margin-top:8px">${+S.profile.targetWeight>0?`🎯 Στόχος: ${String(S.profile.targetWeight).replace('.',',')} kg`:'Προαιρετικό — εμφανίζεται στο γράφημα προόδου.'}</div>
-    </div>
+    <span class="badge ${sc}">${stxt}</span>
+    <div class="hmac">${['carbs','protein','fat'].map(n=>`<button data-act="info" data-n="${n}" aria-label="${NL[n]}: ${r0(t[n])} από ${r0(g[n])} g — τι είναι;"><b>${n==='carbs'?'Υδατάνθρ.':NL[n]}</b>
+      <div class="bar"><i style="width:${g[n]?Math.min(100,t[n]/g[n]*100):0}%;background:${NC[n]}"></i></div><small>${r0(t[n])} / ${r0(g[n])} g</small></button>`).join('')}</div>
   </section>`;
-  const yd=S.days[dk(addDays(curDate,-1))]||{};
+  const mt=microTotals(k),tg=microTargets();
+  h+=`<details class="card" id="microCard" data-keep ${openAttr('microCard')}><summary>🧪 Περισσότερα θρεπτικά</summary>
+    <div class="macros">${['fiber','sugar'].map(n=>bar(n,t[n],g[n])).join('')}${mt.total?MK.map(n=>bar(n,mt.t[n],tg[n],NU[n])).join(''):''}</div>
+    <div class="small muted" style="margin-top:10px">${mt.total?`Μικροθρεπτικά από ${mt.known} στα ${mt.total} τρόφιμα της ημέρας (όσα έχουν τέτοια στοιχεία). Οι στόχοι είναι οι γενικές συστάσεις για ενήλικες.`:'Κατέγραψε τρόφιμα για να δεις και νάτριο, ασβέστιο, σίδηρο, κάλιο και βιταμίνη C.'}</div>
+    <button class="btn block sm" style="margin-top:12px" data-act="guide">📚 Τι κάνει το καθένα;</button></details>`;
+  if(isToday)h+=`<div class="qa2">
+    <button data-act="scanFromAI"><span class="qi" style="background:color-mix(in srgb,var(--protein) 16%,var(--card))">🏷️</span><span>Barcode<small>συσκευασμένα</small></span></button>
+    <button data-act="openScan" data-mode="meal"><span class="qi" style="background:color-mix(in srgb,var(--accent) 16%,var(--card))">📸</span><span>Φωτογραφία<small>πιάτο ή ετικέτα</small></span></button></div>`;
+  h+=`<div class="sec-title" style="margin-top:6px">Γεύματα<span>${(d.entries||[]).length?`${(d.entries||[]).length} ${(d.entries||[]).length===1?'τρόφιμο':'τρόφιμα'}`:''}</span></div><div class="meals">`;
   for(const [m,name,ic] of MEALS){
     const es=(d.entries||[]).filter(e=>e.meal===m),kc=es.reduce((a,e)=>a+(+e.kcal||0),0);
-    const yes=(yd.entries||[]).filter(e=>e.meal===m),ykc=yes.reduce((a,e)=>a+(+e.kcal||0),0);
-    h+=`<section class="card"><div class="mh"><span class="mi" style="background:color-mix(in srgb,${MEAL_TINT[m]} 16%,var(--card))">${ic}</span>
-      <div class="mt"><b>${name}</b><small>${es.length?`${r0(kc)} kcal · ${es.length} ${es.length===1?'τρόφιμο':'τρόφιμα'}`:'Τίποτα ακόμα'}</small></div>
-      <button class="plus" data-act="openAdd" data-meal="${m}" aria-label="Προσθήκη στο ${name}">+</button></div>
-    ${es.map(e=>`<div class="entry"><div class="nm"><b>${esc(e.name)}${e.src==='ai'?'<span class="ai-tag">AI</span>':e.src==='barcode'?'<span class="ai-tag">🏷️</span>':''}</b>
-      <small>${e.grams?r0(e.grams)+' g · ':''}Π ${r1(e.protein)} · Υ ${r1(e.carbs)} · Λ ${r1(e.fat)}</small></div>
-      <span class="kc">${r0(e.kcal)}</span><button class="del" data-act="del" data-id="${e.id}" aria-label="Διαγραφή">×</button></div>`).join('')}
-    ${!es.length&&!yes.length?`<button class="add-btn" data-act="openAdd" data-meal="${m}">+ Πρόσθεσε φαγητό</button>`:''}
-    ${(!es.length&&yes.length)||es.length?`<div class="meal-actions">
-      ${!es.length&&yes.length?`<button class="mini-btn" data-act="copyYesterday" data-meal="${m}" title="${esc(yes.map(e=>e.name).join(', '))}">↺ Ίδιο με χθες · ${r0(ykc)} kcal</button>`:''}
-      ${es.length?`<button class="mini-btn" data-act="saveMeal" data-meal="${m}">⭐ Αποθήκευση γεύματος</button>`:''}</div>`:''}</section>`;
+    h+=`<div class="mtile ${es.length?'':'empty'}" data-act="openMeal" data-meal="${m}" role="button" tabindex="0" aria-label="${name}">
+      <button class="tp" data-act="openAdd" data-meal="${m}" aria-label="Προσθήκη στο ${name}">+</button>
+      <span class="mc" style="background:color-mix(in srgb,${MEAL_TINT[m]} 22%,var(--card))">${ic}</span>
+      <b>${name}</b><small>${es.length?es.map(e=>e.name).join(', '):'Πρόσθεσε φαγητό'}</small>
+      ${es.length?`<span class="kt">${r0(kc)}</span>`:''}</div>`;
   }
+  h+=`</div>`;
+  h+=`<section class="card water"><div class="meal-head" style="margin-bottom:10px"><h3>💧 Νερό <button class="ninfo" data-act="info" data-n="water" aria-label="Γιατί το νερό;">ⓘ</button></h3><span class="small muted">στόχος ${fmtL(g.water)} L</span></div>
+      <div class="water-row"><button class="icon-btn" data-act="water" data-v="-250" aria-label="Λιγότερο νερό">−</button>
+      <div class="water-val"><b>${(water/1000).toFixed(2).replace('.',',')} L</b></div>
+      <button class="icon-btn" data-act="water" data-v="250" aria-label="Περισσότερο νερό">+</button></div>
+      <div class="drops">${Array.from({length:Math.min(glasses,16)},(_,i)=>`<span class="drop ${i<on?'on':''}"></span>`).join('')}</div></section>`;
+  if(isToday&&!(d.entries||[]).length)h+=`<p class="small muted" style="text-align:center;margin:4px 12px 0">Πάτα <b>+</b> σε ένα γεύμα, σκάναρε barcode ή βγάλε φωτογραφία. Πάτα ένα τρόφιμο για να αλλάξεις την ποσότητα.</p>`;
   return h;
 }
 
@@ -1229,12 +1443,15 @@ function lineChart(pts,H=170){
 }
 function weightCard(keys){
   const pts=keys.filter(k=>S.days[k]&&S.days[k].weight).map(k=>({t:pk(k).getTime(),v:+S.days[k].weight,l:fmtDate(pk(k),{day:'numeric',month:'short'})}));
+  const tk=todayK(),tw=+S.profile.targetWeight,last=pts.length?pts[pts.length-1].v:null;
   let diff='';
-  if(pts.length>=2){const d=r1(pts[pts.length-1].v-pts[0].v);diff=`<span class="badge ${d<=0?'hit':'miss'}" style="float:right">${d>0?'+':''}${String(d).replace('.',',')} kg</span>`}
-  const tw=+S.profile.targetWeight;let tgt='';
-  if(tw>0){const cur=pts.length?pts[pts.length-1].v:+S.profile.weight,rem=r1(Math.abs(cur-tw)),f=v=>String(v).replace('.',',');
-    tgt=`<div class="info">🎯 Στόχος βάρους <b>${f(tw)} kg</b> · ${rem<0.1?'τον έπιασες! 🎉':`απομένουν <b>${f(rem)} kg</b>`}</div>`}
-  return`<section class="card"><h3>⚖️ Βάρος ${diff}</h3>${lineChart(pts)}${tgt}</section>`;
+  if(pts.length>=2){const d=r1(pts[pts.length-1].v-pts[0].v);diff=` · ${d>0?'+':''}${fmtN(d)} kg`}
+  let tgt='';
+  if(tw>0){const cur=last??+S.profile.weight,rem=r1(Math.abs(cur-tw));
+    tgt=`<div class="info">🎯 Στόχος βάρους <b>${fmtN(tw)} kg</b> · ${rem<0.1?'τον έπιασες! 🎉':`απομένουν <b>${fmtN(rem)} kg</b>`}</div>`}
+  return`<details class="card" id="weightCard" data-keep ${openAttr('weightCard')}><summary>⚖️ Βάρος<span class="small muted" style="margin-left:auto;margin-right:8px;font-weight:650">${last!=null?fmtN(last)+' kg':''}${diff}</span></summary>
+    <div class="row"><label class="f" style="margin:0;white-space:nowrap" for="wIn">Σήμερα</label><input type="number" id="wIn" step="0.1" min="20" max="400" inputmode="decimal" placeholder="π.χ. 74,5" value="${(S.days[tk]||{}).weight??''}" data-weight="${tk}"><span class="muted">kg</span></div>
+    <div style="margin-top:12px">${lineChart(pts)}</div>${tgt}</details>`;
 }
 function avgBlock(keys,title){
   const lk=keys.filter(hasE),hits=keys.filter(k=>status(k)==='hit').length;
@@ -1252,46 +1469,24 @@ const LEGEND=`<div class="legend"><span><i style="background:var(--accent)"></i>
 /* ---------- Πρόοδος ---------- */
 function renderProgress(){
   const s=streaks(),a=prog.anchor,today=new Date(),st=achStats(),unlocked=ACH.filter(x=>x[4](st)).length;
-  let h=`<div class="stats4">
+  if(!['week','month','year'].includes(prog.view))prog.view='week';
+  let h=`<div class="page-title">Η πρόοδός σου</div>
+  <div class="stats2">
     <div class="sc fire"><div class="e">🔥</div><b>${s.cur}</b><span>τρέχον streak</span></div>
-    <div class="sc"><div class="e">🏆</div><b>${s.best}</b><span>καλύτερο streak</span></div>
-    <div class="sc"><div class="e">✅</div><b>${s.hits}</b><span>μέρες επιτυχίας</span></div>
-    <div class="sc"><div class="e">📒</div><b>${s.logged}</b><span>μέρες καταγραφής</span></div></div>
-  <details class="card"><summary>🏅 Επιτεύγματα <span class="small muted" style="margin-left:auto;margin-right:8px;font-weight:600">${unlocked}/${ACH.length}</span></summary>
-    <div class="ach">${ACH.map(x=>`<div class="${x[4](st)?'':'locked'}"><span class="e">${x[1]}</span><b>${x[2]}</b><small>${x[3]}</small></div>`).join('')}</div>
-    <div class="small muted" style="margin-top:10px">❄️ Πάγωμα streak: 1 τον μήνα — ${freezesInMonth(todayK())?'το χρησιμοποίησες αυτόν τον μήνα':'διαθέσιμο αυτόν τον μήνα'}.</div></details>
-  <div class="seg">${[['day','Ημέρα'],['week','Εβδομάδα'],['month','Μήνας'],['year','Έτος']].map(([v,l])=>`<button class="${prog.view===v?'on':''}" data-act="pview" data-v="${v}">${l}</button>`).join('')}</div>`;
+    <div class="sc"><div class="e">🏆</div><b>${s.best}</b><span>καλύτερο streak</span></div></div>
+  <div class="small muted" style="text-align:center;margin:0 4px 14px;font-weight:650">✅ ${s.hits} ${s.hits===1?'μέρα':'μέρες'} επιτυχίας · 📒 ${s.logged} ${s.logged===1?'μέρα':'μέρες'} καταγραφής</div>
+  <div class="seg">${[['week','Εβδομάδα'],['month','Μήνας'],['year','Έτος']].map(([v,l])=>`<button class="${prog.view===v?'on':''}" data-act="pview" data-v="${v}">${l}</button>`).join('')}</div>`;
   let title='',nextDis=false;
-  if(prog.view==='day'){title=cap(fmtDate(a,{weekday:'short',day:'numeric',month:'long',year:'numeric'}));nextDis=dk(a)>=dk(today)}
-  else if(prog.view==='week'){const m=mondayOf(a),e=addDays(m,6);title=`${fmtDate(m,{day:'numeric',month:'short'})} – ${fmtDate(e,{day:'numeric',month:'short',year:'numeric'})}`;nextDis=dk(e)>=dk(today)}
+  if(prog.view==='week'){const m=mondayOf(a),e=addDays(m,6);title=`${fmtDate(m,{day:'numeric',month:'short'})} – ${fmtDate(e,{day:'numeric',month:'short',year:'numeric'})}`;nextDis=dk(e)>=dk(today)}
   else if(prog.view==='month'){title=cap(fmtDate(a,{month:'long',year:'numeric'}));nextDis=a.getFullYear()*12+a.getMonth()>=today.getFullYear()*12+today.getMonth()}
   else{title=String(a.getFullYear());nextDis=a.getFullYear()>=today.getFullYear()}
   h+=`<div class="period-nav"><button class="icon-btn" data-act="pnav" data-d="-1" aria-label="Προηγούμενο">‹</button><div>${title}</div><button class="icon-btn" data-act="pnav" data-d="1" ${nextDis?'disabled':''} aria-label="Επόμενο">›</button></div>`;
-  if(prog.view==='day')h+=progDay(a);
-  else if(prog.view==='week')h+=progWeek(a);
+  if(prog.view==='week')h+=progWeek(a);
   else if(prog.view==='month')h+=progMonth(a);
   else h+=progYear(a);
-  return h;
-}
-function progDay(a){
-  const k=dk(a),t=totals(k),g=S.goals,d=S.days[k]||{},[sc,stxt]=statusText(k),mt=microTotals(k),tg=microTargets();
-  let h=`<section class="card"><div class="meal-head"><h3>Σύνοψη ημέρας</h3><span class="badge ${sc}">${stxt}</span></div>
-  <table class="nt"><tr><th>Θρεπτικό</th><th>Κατανάλωση</th><th>Στόχος</th><th>%</th></tr>
-  ${NK.map(n=>`<tr><td>${NL[n]}</td><td><b>${r0(t[n])}</b> ${NU[n]}</td><td>${r0(g[n])}</td><td>${g[n]?r0(t[n]/g[n]*100):0}%</td></tr>`).join('')}
-  <tr><td>Νερό</td><td><b>${r0(d.water||0)}</b> ml</td><td>${r0(g.water)}</td><td>${g.water?r0((d.water||0)/g.water*100):0}%</td></tr>
-  ${d.weight?`<tr><td>Βάρος</td><td><b>${d.weight}</b> kg</td><td>—</td><td>—</td></tr>`:''}
-  ${mt.known?`<tr class="sep"><td colspan="4">Μικροθρεπτικά (από ${mt.known}/${mt.total} τρόφιμα)</td></tr>`+MK.map(n=>`<tr><td>${NL[n]}</td><td><b>${NU[n]==='mg'?r0(mt.t[n]):r1(mt.t[n])}</b> ${NU[n]}</td><td>${tg[n]}${LIMITS.has(n)?' (όριο)':''}</td><td>${r0(mt.t[n]/tg[n]*100)}%</td></tr>`).join(''):''}
-  </table></section>`;
-  if(canFreeze(k))h+=`<div class="tip ice"><span class="e">❄️</span><div><b>Πάγωμα streak</b><br><span class="muted">Σώσε το streak σου για αυτή τη μέρα (1 τον μήνα).</span></div><button class="btn" data-act="freeze" data-k="${k}">Πάγωμα</button></div>`;
-  else if(S.freezes[k]&&status(k)==='freeze')h+=`<div class="tip ice"><span class="e">❄️</span><div><b>Αυτή η μέρα είναι παγωμένη</b><br><span class="muted">Το streak σου συνεχίζεται κανονικά.</span></div><button class="btn" data-act="unfreeze" data-k="${k}">Αναίρεση</button></div>`;
-  const es=d.entries||[];
-  if(es.length){
-    h+=`<section class="card"><h3>Τι έφαγες</h3>`;
-    for(const [m,name,ic] of MEALS){const x=es.filter(e=>e.meal===m);if(!x.length)continue;
-      h+=`<div class="small muted" style="margin:10px 0 2px;font-weight:700">${ic} ${name}</div>`+x.map(e=>`<div class="entry"><div class="nm"><b>${esc(e.name)}</b><small>${e.grams?r0(e.grams)+' g · ':''}Π ${r1(e.protein)} · Υ ${r1(e.carbs)} · Λ ${r1(e.fat)}</small></div><span class="kc">${r0(e.kcal)}</span></div>`).join('')}
-    h+=`</section>`;
-  }
-  h+=`<button class="btn block" data-act="editDay" data-k="${k}">✏️ Επεξεργασία αυτής της μέρας</button>`;
+  h+=`<details class="card" id="achCard" data-keep ${openAttr('achCard')}><summary>🏅 Επιτεύγματα <span class="small muted" style="margin-left:auto;margin-right:8px;font-weight:650">${unlocked}/${ACH.length}</span></summary>
+    <div class="ach">${ACH.map(x=>`<div class="${x[4](st)?'':'locked'}"><span class="e">${x[1]}</span><b>${x[2]}</b><small>${x[3]}</small></div>`).join('')}</div>
+    <div class="small muted" style="margin-top:10px">❄️ Πάγωμα streak: 1 τον μήνα — ${freezesInMonth(todayK())?'το χρησιμοποίησες αυτόν τον μήνα':'διαθέσιμο αυτόν τον μήνα'}.</div></details>`;
   return h;
 }
 function weekKeys(a){const m=mondayOf(a);return Array.from({length:7},(_,i)=>dk(addDays(m,i)))}
@@ -1321,7 +1516,7 @@ function progMonth(a){
   keys.forEach((k,i)=>{const st=status(k),fut=k>tk,t=totals(k);
     cal+=`<button class="cell ${st!=='none'?st:''} ${k===tk?'today':''} ${fut?'future':''}" ${fut?'disabled':''} data-act="gotoDay" data-k="${k}" title="${st==='none'?'Χωρίς καταγραφή':st==='freeze'&&!hasE(k)?'Πάγωμα':r0(t.kcal)+' kcal'}"><span class="dn">${i+1}</span>${hasE(k)?`<span class="dk">${r0(t.kcal)}</span>`:st==='freeze'?'<span class="dk">❄️</span>':''}</button>`});
   const items=keys.map((k,i)=>({v:totals(k).kcal,c:status(k),l:String(i+1),t:`${i+1}/${mo+1}: ${r0(totals(k).kcal)} kcal`}));
-  return`<section class="card"><h3>Ημερολόγιο</h3><div class="cal">${cal}</div>${LEGEND}<div class="small muted" style="margin-top:6px">Πάτα μια μέρα για λεπτομέρειες.</div></section>
+  return`<section class="card"><h3>Ημερολόγιο</h3><div class="cal">${cal}</div>${LEGEND}<div class="small muted" style="margin-top:6px">Πάτα μια μέρα για να τη δεις ή να τη διορθώσεις.</div></section>
     <section class="card"><h3>Θερμίδες ανά ημέρα</h3>${barChart(items,S.goals.kcal)}</section>
     ${avgBlock(keys,'Μέσοι όροι μήνα')}${weightCard(keys)}`;
 }
@@ -1354,37 +1549,39 @@ async function makeReview(wk){
   rvBusy=false;if(tab==='progress')render();
 }
 
-/* ---------- Σάρωση γεύματος ---------- */
-async function analyze(){
-  if(!ai.b64&&!ai.desc.trim()){toast('Ανέβασε φωτογραφία ή γράψε μια περιγραφή');return}
-  ai.loading=true;ai.error='';ai.result=null;render();
-  try{
-    const r=await callAI({action:'analyze',image:ai.b64||null,desc:ai.desc.trim(),context:aiContext()});
-    const j=r.result||{};
-    ai.result={isFood:j.is_food!==false,dish:j.dish||'',notes:j.notes||'',confidence:j.confidence||'medium',
-      items:(j.items||[]).map(it=>{const g=+it.grams||0;const base={grams:g};ALLK.forEach(n=>{if(it[n]!=null)base[n]=+it[n]||0});return{on:true,name:it.name||'Τρόφιμο',grams:g,base}})};
-  }catch(e){ai.error=e.message||String(e)}
-  ai.loading=false;if(tab==='ai')render();
+/* ---------- Σάρωση: πιάτο (εκτίμηση AI) ή ετικέτα (ακριβής ανάγνωση) ---------- */
+function openScan(mode,o={}){
+  ai={mode:mode==='label'?'label':'meal',img:null,b64:null,desc:o.desc||'',loading:false,error:'',result:null,label:null,
+    meal:o.meal||guessMeal(),day:o.day||todayK(),code:o.code||''};
+  renderScan();const d=$('#scanDlg');if(!d.open)d.showModal();
 }
-function itemVals(it){const f=it.base.grams?it.grams/it.base.grams:1;const o={};ALLK.forEach(n=>{if(it.base[n]!=null)o[n]=r1(it.base[n]*f)});NK.forEach(n=>{if(o[n]==null)o[n]=0});return o}
-function renderAI(){
-  const conf={low:'χαμηλή',medium:'μέτρια',high:'υψηλή'};
-  let h=`<section class="card"><h3>📸 Σάρωση γεύματος</h3>
-  <p class="muted small" style="margin-top:-6px">Τράβηξε ή ανέβασε φωτογραφία του πιάτου σου και το <b>Nutri AI</b> θα εκτιμήσει θερμίδες και θρεπτικά για κάθε συστατικό. Μπορείς να γράψεις και μόνο περιγραφή. Για συσκευασμένα προϊόντα, χρησιμοποίησε το <button class="link" data-act="scanFromAI">🏷️ barcode</button> για ακριβείς τιμές.</p>`;
-  h+=ai.img?`<img src="${ai.img}" class="preview" alt="Φωτογραφία γεύματος"><div class="row" style="margin-top:10px"><button class="btn" data-act="pickImg" data-src="gal">Αλλαγή φωτογραφίας</button><button class="btn" data-act="clearImg">Αφαίρεση</button></div>`
-    :`<div class="drop-zone" id="dropZone"><div class="big">🍽️</div><p style="margin:6px 0 12px">Σύρε μια φωτογραφία εδώ ή</p>
+function renderScan(){
+  const sc=$('#scanIn .sheet-scroll'),y=sc?sc.scrollTop:0;
+  $('#scanIn').innerHTML=`<div class="sheet-head"><h3>📸 Σάρωση</h3><button class="icon-btn" data-act="closeScan" aria-label="Κλείσιμο">✕</button></div>
+    <div class="seg">${[['meal','🍽️ Πιάτο φαγητού'],['label','🧾 Ετικέτα συσκευασίας']].map(([v,l])=>`<button class="${ai.mode===v?'on':''}" data-act="scanMode" data-v="${v}">${l}</button>`).join('')}</div>
+    <div class="sheet-scroll">${scanBody()}</div>`;
+  const ns=$('#scanIn .sheet-scroll');if(ns)ns.scrollTop=y;
+}
+function scanBody(){
+  const lbl=ai.mode==='label';
+  let h=lbl
+    ?`<p class="small muted" style="margin:0 0 12px">Φωτογράφισε τον πίνακα <b>«Διατροφικά στοιχεία»</b> της συσκευασίας. Το NutriLog θα διαβάσει τις τιμές <b>ακριβώς όπως είναι τυπωμένες</b>, χωρίς εκτιμήσεις. Για καλύτερο αποτέλεσμα: ίσια λήψη, καλό φως, να χωράει όλος ο πίνακας.</p>`
+    :`<p class="small muted" style="margin:0 0 12px">Φωτογράφισε το πιάτο σου και το <b>Nutri AI</b> θα εκτιμήσει θερμίδες και θρεπτικά για κάθε συστατικό. Οι τιμές είναι εκτίμηση· για συσκευασμένα προϊόντα διάλεξε <button class="link" data-act="scanMode" data-v="label">🧾 Ετικέτα</button> ή <button class="link" data-act="scanFromAI">🏷️ barcode</button>.</p>`;
+  h+=ai.img?`<img src="${ai.img}" class="preview" alt="${lbl?'Φωτογραφία ετικέτας':'Φωτογραφία γεύματος'}"><div class="row" style="margin-top:10px"><button class="btn" data-act="pickImg" data-src="cam">📷 Νέα φωτογραφία</button><button class="btn" data-act="pickImg" data-src="gal">🖼️ Συλλογή</button></div>`
+    :`<div class="drop-zone" id="dropZone"><div class="big">${lbl?'🧾':'🍽️'}</div><p style="margin:6px 0 12px">${lbl?'Φωτογράφισε τον πίνακα διατροφικών στοιχείων':'Σύρε μια φωτογραφία εδώ ή'}</p>
       <div class="row" style="justify-content:center;flex-wrap:wrap"><button class="btn primary" data-act="pickImg" data-src="cam">📷 Κάμερα</button><button class="btn" data-act="pickImg" data-src="gal">🖼️ Από συλλογή</button></div></div>`;
-  h+=`<label class="f" for="aiDesc">Επιπλέον πληροφορίες (προαιρετικό)</label>
-  <textarea id="aiDesc" rows="2" data-input="aidesc" placeholder="π.χ. μαγειρεμένο με 2 κ.σ. ελαιόλαδο, μισή μερίδα ρύζι">${esc(ai.desc)}</textarea>
-  <button class="btn primary block lg" style="margin-top:12px" data-act="analyze" ${ai.loading?'disabled':''}>${ai.loading?'Ανάλυση…':'✨ Ανάλυση γεύματος'}</button></section>`;
-  if(ai.loading)h+=`<section class="card" style="text-align:center"><div class="spinner"></div><span class="muted">Το Nutri AI αναλύει το γεύμα σου…</span></section>`;
-  if(ai.error)h+=`<div class="err mb">⚠️ ${esc(ai.error)}</div>`;
+  if(!lbl)h+=`<label class="f" for="aiDesc">Επιπλέον πληροφορίες (προαιρετικό)</label>
+    <textarea id="aiDesc" rows="2" data-input="aidesc" placeholder="π.χ. μαγειρεμένο με 2 κ.σ. ελαιόλαδο, μισή μερίδα ρύζι">${esc(ai.desc)}</textarea>`;
+  if(!(lbl&&ai.label))h+=`<button class="btn primary block lg" style="margin-top:12px" data-act="analyze" ${ai.loading?'disabled':''}>${ai.loading?(lbl?'Ανάγνωση…':'Ανάλυση…'):lbl?'🧾 Ανάγνωση ετικέτας':'✨ Ανάλυση γεύματος'}</button>`;
+  if(ai.loading)h+=`<div style="text-align:center;padding:18px"><div class="spinner"></div><span class="muted">${lbl?'Διαβάζω την ετικέτα…':'Το Nutri AI αναλύει το γεύμα σου…'}</span></div>`;
+  if(ai.error)h+=`<div class="err" style="margin-top:12px">⚠️ ${esc(ai.error)}</div>`;
+  if(lbl&&ai.label)return h+labelHtml();
   const R=ai.result;
-  if(R){
-    if(!R.isFood||!R.items.length){h+=`<section class="card"><p>Δεν αναγνωρίστηκε φαγητό στην εικόνα. ${esc(R.notes)}</p></section>`;return h}
-    const tot={kcal:0,protein:0,carbs:0,fat:0,fiber:0,sugar:0};
+  if(!lbl&&R){
+    if(!R.isFood||!R.items.length)return h+`<div class="info">Δεν αναγνωρίστηκε φαγητό στην εικόνα. ${esc(R.notes)}</div>`;
+    const conf={low:'χαμηλή',medium:'μέτρια',high:'υψηλή'},tot={kcal:0,protein:0,carbs:0,fat:0,fiber:0,sugar:0};
     R.items.forEach(it=>{if(!it.on)return;const v=itemVals(it);NK.forEach(n=>tot[n]+=v[n])});
-    h+=`<section class="card"><div class="meal-head"><h3>${esc(R.dish||'Αποτέλεσμα')}</h3><span class="badge ${R.confidence==='high'?'hit':R.confidence==='low'?'miss':'none'}">Βεβαιότητα: ${conf[R.confidence]||R.confidence}</span></div>
+    h+=`<section class="card" style="margin-top:14px"><div class="meal-head"><h3>${esc(R.dish||'Αποτέλεσμα')}</h3><span class="badge ${R.confidence==='high'?'hit':R.confidence==='low'?'miss':'none'}">Βεβαιότητα: ${conf[R.confidence]||R.confidence}</span></div>
     <div class="prev">${NK.map(n=>`<div><b>${r0(tot[n])}</b><span>${NL[n]}${n!=='kcal'?' (g)':''}</span></div>`).join('')}</div>
     ${R.notes?`<div class="note">💡 ${esc(R.notes)}</div>`:''}
     <div class="ai-items" style="margin-top:12px">${R.items.map((it,i)=>{const v=itemVals(it);return`<div class="it ${it.on?'':'off'}">
@@ -1392,21 +1589,130 @@ function renderAI(){
       <input type="text" value="${esc(it.name)}" data-ainame="${i}" aria-label="Όνομα">
       <div class="row" style="gap:4px"><input type="number" min="0" step="5" value="${r0(it.grams)}" data-aigrams="${i}" aria-label="Γραμμάρια"><span class="small muted">g</span></div>
       <small><b>${r0(v.kcal)} kcal</b> · Π ${v.protein} · Υ ${v.carbs} · Λ ${v.fat} · Ίνες ${v.fiber}</small></div>`}).join('')}</div>
-    <p class="small muted">Άλλαξε τα γραμμάρια αν η εκτίμηση δεν είναι σωστή — οι τιμές προσαρμόζονται αυτόματα.</p>
+    <p class="small muted">Άλλαξε τα γραμμάρια αν η εκτίμηση δεν είναι σωστή, οι τιμές προσαρμόζονται αυτόματα.</p>
     <div class="row"><select data-aimeal>${MEALS.map(([m,n])=>`<option value="${m}" ${ai.meal===m?'selected':''}>${n}</option>`).join('')}</select>
-    <button class="btn primary" style="white-space:nowrap" data-act="aiAdd">Προσθήκη σήμερα</button></div></section>`;
+    <button class="btn primary" style="white-space:nowrap" data-act="aiAdd">Προσθήκη</button></div></section>`;
   }
   return h;
 }
+async function analyze(){
+  if(ai.mode==='label')return readLabel();
+  if(!ai.b64&&!ai.desc.trim()){toast('Ανέβασε φωτογραφία ή γράψε μια περιγραφή');return}
+  ai.loading=true;ai.error='';ai.result=null;renderScan();
+  try{
+    const r=await callAI({action:'analyze',image:ai.b64||null,desc:ai.desc.trim(),context:aiContext()});
+    if(r.kind==='label'){ai.mode='label';setLabel(r.result)} // η φωτογραφία ήταν ετικέτα: ακριβής ανάγνωση
+    else{const j=r.result||{};
+      ai.result={isFood:j.is_food!==false,dish:j.dish||'',notes:j.notes||'',confidence:j.confidence||'medium',
+        items:(j.items||[]).map(it=>{const g=+it.grams||0;const base={grams:g};ALLK.forEach(n=>{if(it[n]!=null)base[n]=+it[n]||0});return{on:true,name:it.name||'Τρόφιμο',grams:g,base}})}}
+  }catch(e){ai.error=e.message||String(e)}
+  ai.loading=false;if($('#scanDlg').open)renderScan();
+}
+async function readLabel(){
+  if(!ai.b64){toast('Τράβηξε πρώτα φωτογραφία την ετικέτα');return}
+  ai.loading=true;ai.error='';ai.label=null;renderScan();
+  try{const r=await callAI({action:'label',image:ai.b64});setLabel(r.result)}catch(e){ai.error=e.message||String(e)}
+  ai.loading=false;if($('#scanDlg').open)renderScan();
+}
+function itemVals(it){const f=it.base.grams?it.grams/it.base.grams:1;const o={};ALLK.forEach(n=>{if(it.base[n]!=null)o[n]=r1(it.base[n]*f)});NK.forEach(n=>{if(o[n]==null)o[n]=0});return o}
 function loadImage(file){
   if(!file)return;
+  // 1600px: αρκετή ανάλυση για να διαβάζονται καθαρά οι μικροί αριθμοί μιας ετικέτας
   const url=URL.createObjectURL(file),img=new Image();
-  img.onload=()=>{const M=1024,s=Math.min(1,M/Math.max(img.width,img.height)),c=document.createElement('canvas');
+  img.onload=()=>{const M=1600,s=Math.min(1,M/Math.max(img.width,img.height)),c=document.createElement('canvas');
     c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-    const du=c.toDataURL('image/jpeg',0.85);ai.img=du;ai.b64=du.split(',')[1];ai.result=null;ai.error='';URL.revokeObjectURL(url);render()};
+    const du=c.toDataURL('image/jpeg',0.9);ai.img=du;ai.b64=du.split(',')[1];ai.result=null;ai.label=null;ai.error='';URL.revokeObjectURL(url);
+    if(ai.mode==='label')readLabel();else renderScan()};
   img.onerror=()=>{URL.revokeObjectURL(url);toast('Δεν ήταν δυνατή η ανάγνωση της εικόνας')};
   img.src=url;
 }
+
+/* ---------- Ετικέτα: οι τιμές μένουν όπως τυπώθηκαν, ο υπολογισμός γίνεται μόνο με απλή αναλογία ---------- */
+function setLabel(j){
+  if(!j||j.is_label===false){ai.label=null;ai.error='Δεν βρέθηκε πίνακας διατροφικών στοιχείων στη φωτογραφία. Φωτογράφισε τον πίνακα από πιο κοντά, ίσια και με καλό φως.';return}
+  const vals=o=>{const v={};LBK.forEach(k=>{const x=o&&o[k];v[k]=x==null||x===''||!isFinite(+x)?null:+x});return v};
+  let srv=j.has_serving?{label:String(j.serving_label||''),size:+j.serving_size>0?+j.serving_size:null,v:vals(j.per_serving)}:null;
+  if(srv&&!Object.values(srv.v).some(x=>x!=null))srv=null;
+  const L={product:String(j.product||'').trim(),unit:j.unit==='ml'?'ml':'g',p:vals(j.per100),srv,pkg:+j.package_size>0?+j.package_size:null,
+    lines:Array.isArray(j.lines)?j.lines.map(String).slice(0,30):[],notes:String(j.notes||''),save:true,code:ai.code||''};
+  L.g=srv&&srv.size?srv.size:100;
+  ai.label=L;
+}
+// Τιμές ετικέτας (kJ, αλάτι κ.λπ.) → μονάδες της εφαρμογής. Μόνο μετατροπές μονάδων, καμία εκτίμηση.
+function labelPer(v){
+  const o={};let kcal=v.energy_kcal;if(kcal==null&&v.energy_kj!=null)kcal=v.energy_kj/4.184;
+  if(kcal!=null)o.kcal=kcal;
+  ['protein','carbs','fat','fiber','sugar','satfat','calcium','iron','potassium','vitc'].forEach(k=>{if(v[k]!=null)o[k]=v[k]});
+  const na=v.sodium!=null?v.sodium:v.salt!=null?v.salt*400:null;if(na!=null)o.sodium=na;
+  return o;
+}
+function lbBase(L){ // ανά 100 g/ml
+  const p=labelPer(L.p);if(p.kcal!=null)return p;
+  if(L.srv&&L.srv.size){const s=labelPer(L.srv.v),o={};for(const k in s)o[k]=s[k]*100/L.srv.size;return o}
+  return p;
+}
+function lbCalc(L,g){
+  if(L.srv&&L.srv.size&&g>0){const n=g/L.srv.size,m=Math.round(n);
+    if(m>=1&&Math.abs(n-m)<1e-9){const s=labelPer(L.srv.v);if(s.kcal!=null){const o={};for(const k in s)o[k]=s[k]*m;return o}}}
+  const p=lbBase(L),o={};for(const k in p)o[k]=p[k]*g/100;return o;
+}
+function fixVals(o){const r={};for(const k of ALLK)if(o[k]!=null&&isFinite(o[k]))r[k]=r2(o[k]);NK.forEach(n=>{if(r[n]==null)r[n]=0});return r}
+// Έλεγχοι συνέπειας: δεν αλλάζουν τίποτα, απλώς επισημαίνουν πιθανό λάθος ανάγνωσης.
+function lbIssues(v,per100){
+  const w=[],kcal=v.energy_kcal!=null?v.energy_kcal:v.energy_kj!=null?v.energy_kj/4.184:null;
+  if(kcal==null)return['λείπουν οι θερμίδες (kcal)'];
+  if(v.energy_kj!=null&&v.energy_kcal!=null&&Math.abs(v.energy_kj/4.184-v.energy_kcal)>Math.max(4,v.energy_kcal*.05))w.push(`τα ${fmtN(v.energy_kj)} kJ δεν αντιστοιχούν σε ${fmtN(v.energy_kcal)} kcal`);
+  const P=v.protein,Cb=v.carbs,F=v.fat;
+  if(P!=null&&Cb!=null&&F!=null){const est=4*P+4*Cb+9*F+2*(v.fiber||0);
+    if(Math.abs(est-kcal)>Math.max(15,kcal*.2))w.push(`οι θερμίδες (${r0(kcal)}) δεν συμφωνούν με τα μακροθρεπτικά (≈${r0(est)} kcal) — εκτός αν το προϊόν έχει πολυόλες ή αλκοόλ`)}
+  if(v.sugar!=null&&Cb!=null&&v.sugar>Cb+0.05)w.push('τα σάκχαρα είναι περισσότερα από τους υδατάνθρακες');
+  if(v.satfat!=null&&F!=null&&v.satfat>F+0.05)w.push('τα κορεσμένα είναι περισσότερα από τα λιπαρά');
+  if(per100&&(P||0)+(Cb||0)+(F||0)+(v.fiber||0)+(v.salt||0)>101)w.push('τα θρεπτικά ξεπερνούν τα 100 g ανά 100 g');
+  return w;
+}
+function lbCheckHtml(){
+  const L=ai.label;
+  if(lbBase(L).kcal==null)return`<div class="err" style="margin-top:10px">⚠️ Δεν διαβάστηκαν οι θερμίδες. Συμπλήρωσέ τες από τη συσκευασία.</div>`;
+  const miss=x=>/λείπουν/.test(x); // αρκεί η μία από τις δύο στήλες να έχει θερμίδες
+  const w=lbIssues(L.p,true).filter(x=>!miss(x)).map(x=>'ανά 100: '+x);
+  if(L.srv)w.push(...lbIssues(L.srv.v,false).filter(x=>!miss(x)).map(x=>'ανά μερίδα: '+x));
+  return w.length?`<div class="warn">⚠️ Σύγκρινε με τη συσκευασία — κάτι μπορεί να διαβάστηκε λάθος:<ul>${w.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`
+    :`<div class="note" style="margin-top:10px">✓ Οι τιμές είναι συνεπείς μεταξύ τους. Έλεγξε με μια ματιά ότι ταιριάζουν με την ετικέτα.</div>`;
+}
+function lbPrevHtml(){const L=ai.label,v=lbCalc(L,+L.g||0);return NK.map(n=>`<div><b>${n==='kcal'?r0(v[n]):fmtN(r1(v[n]))}</b><span>${NL[n]}${n!=='kcal'?' (g)':''}</span></div>`).join('')}
+function lbQtyNote(){const L=ai.label,g=+L.g||0;if(!(L.srv&&L.srv.size&&g>0))return'';const n=g/L.srv.size,m=Math.round(n);
+  return m>=1&&Math.abs(n-m)<1e-9?`Χρησιμοποιούνται οι τιμές «ανά μερίδα» της ετικέτας${m>1?` × ${m}`:''}.`:'Υπολογισμός από τις τιμές «ανά 100» της ετικέτας.'}
+function labelHtml(){
+  const L=ai.label,u=L.unit,hasS=!!L.srv;
+  const extra=LROWS.slice(9).filter(r=>L.p[r[0]]!=null||(hasS&&L.srv.v[r[0]]!=null));
+  const rows=[...LROWS.slice(0,9),...extra];
+  const inp=(src,k)=>{const o=src==='p'?L.p:L.srv.v;return`<input type="number" inputmode="decimal" step="any" min="0" data-lb="${src}.${k}" value="${o[k]??''}" placeholder="—" aria-label="${k}">`};
+  const chips=[];
+  if(L.srv&&L.srv.size){const sl=(L.srv.label||'').replace(/\s*\(.*\)\s*$/,'').trim()||'μερίδα';
+    chips.push([L.srv.size,`${/^\d/.test(sl)?'':'1 '}${esc(sl)} (${fmtN(L.srv.size)} ${u})`]);chips.push([L.srv.size*2,`2 μερίδες (${fmtN(L.srv.size*2)} ${u})`])}
+  chips.push([100,`100 ${u}`]);
+  if(L.pkg)chips.push([L.pkg,`Όλη η συσκευασία (${fmtN(L.pkg)} ${u})`]);
+  return`<section class="card" style="margin-top:14px"><div class="meal-head"><h3>🧾 Διατροφικά στοιχεία</h3><span class="badge hit">Από την ετικέτα</span></div>
+    <label class="f" style="margin-top:0" for="lbName">Προϊόν</label><input type="text" id="lbName" data-lbname value="${esc(L.product)}" placeholder="Όνομα προϊόντος (π.χ. Μπάρα βρώμης Χ)">
+    <table class="lbl"><tr><th></th><th>ανά 100 ${u}</th>${hasS?`<th>ανά μερίδα${L.srv.size?`<br>(${fmtN(L.srv.size)} ${u})`:''}</th>`:''}</tr>
+    ${rows.map(([k,l,un,sub])=>`<tr class="${sub?'sub':''}"><td>${l} <span class="u">${un}</span></td><td>${inp('p',k)}</td>${hasS?`<td>${inp('s',k)}</td>`:''}</tr>`).join('')}</table>
+    <div id="lbCheck">${lbCheckHtml()}</div>
+    ${L.notes?`<div class="info">ℹ️ ${esc(L.notes)}</div>`:''}
+    ${L.lines.length?`<details class="acc"><summary>📄 Τι διαβάστηκε (αυτούσιο)</summary><div class="small" style="white-space:pre-wrap;margin-top:6px">${esc(L.lines.join('\n'))}</div></details>`:''}
+    <p class="small muted" style="margin:10px 0 0">Μπορείς να διορθώσεις οποιοδήποτε κελί. Κενό = δεν αναγράφεται.</p>
+  </section>
+  <section class="card"><h3>🍽️ Πόσο έφαγες;</h3>
+    <div class="chips" style="margin-top:0">${chips.map(([g,l])=>`<button class="chip" data-act="lbSetG" data-g="${g}">${l}</button>`).join('')}</div>
+    <div class="row" style="margin-top:10px"><input type="number" id="lbG" data-lbg min="0" step="any" inputmode="decimal" value="${L.g}" aria-label="Ποσότητα"><span class="muted">${u}</span></div>
+    <div class="prev" id="lbPrev">${lbPrevHtml()}</div>
+    <div class="small muted" id="lbQty" style="margin-top:-6px">${lbQtyNote()}</div>
+    <label class="f">Γεύμα</label><select data-aimeal>${MEALS.map(([m,n])=>`<option value="${m}" ${ai.meal===m?'selected':''}>${n}</option>`).join('')}</select>
+    <label class="consent"><input type="checkbox" data-lbsave ${L.save?'checked':''}><span>⭐ Αποθήκευση στα τρόφιμά μου, για να το βρίσκεις στην αναζήτηση${L.code?' και με σάρωση του barcode':''} με τις ίδιες ακριβώς τιμές</span></label>
+    <label class="f" for="lbCode">Barcode (προαιρετικό)</label><input type="text" id="lbCode" inputmode="numeric" data-lbcode value="${esc(L.code)}" placeholder="για να το βρίσκεις με σάρωση" autocomplete="off">
+    <button class="btn primary block lg" style="margin-top:14px" data-act="labelAdd">Προσθήκη${ai.day!==todayK()?` (${fmtDate(pk(ai.day),{day:'numeric',month:'short'})})`:''}</button>
+  </section>`;
+}
+function refreshLabel(){const a=$('#lbCheck'),b=$('#lbPrev'),c=$('#lbQty');if(a)a.innerHTML=lbCheckHtml();if(b)b.innerHTML=lbPrevHtml();if(c)c.textContent=lbQtyNote()}
 
 /* ---------- Προτάσεις γευμάτων ---------- */
 function openSuggest(){sug={meal:guessMeal(),wish:'',loading:false,error:'',result:null};renderSug();$('#sugDlg').showModal()}
@@ -1456,16 +1762,15 @@ function remCard(){
   return h;
 }
 function renderSettings(){
-  const p=S.profile,g=S.goals,st=S.settings,tol=(+st.tolerance||10)/100;
+  const p=S.profile,g=S.goals;
   const act=ACTIVITY.find(a=>a[0]==p.activity)||ACTIVITY[2],gl=GOALS.find(x=>x[0]===p.goal)||GOALS[2];
   const prov=(user.app_metadata&&user.app_metadata.provider)||'email';
-  if(!models.list&&!models.loading&&!models.err)setTimeout(loadModels,0);
   const num=(path,val,step=1)=>`<input type="number" step="${step}" min="0" inputmode="decimal" value="${val}" data-set="${path}">`;
   const gchip=(c,l,v)=>`<span class="gchip"><i style="background:${c}"></i>${l} ${v}</span>`;
   return`<section class="card"><div class="acct"><button class="avatar av-edit" data-act="editProfile" aria-label="Αλλαγή φωτογραφίας προφίλ">${avatarHtml()}<i>📷</i></button>
       <div style="flex:1;min-width:0"><b style="font-size:19px;letter-spacing:-.02em">${esc(displayName())}</b><div class="small muted" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(user.email||'')}</div>
       <span class="badge none" style="margin-top:6px">${prov==='google'?'Σύνδεση με Google':'Σύνδεση με email'}</span></div></div>
-    <div class="row" style="margin-top:14px"><button class="btn primary" style="flex:1" data-act="editProfile">✏️ Επεξεργασία προφίλ</button><button class="btn" data-act="logout">Αποσύνδεση</button></div>
+    <button class="btn primary block" style="margin-top:14px" data-act="editProfile">✏️ Επεξεργασία προφίλ</button>
     <div class="info" id="syncLine">${syncText()}</div></section>
 
   <section class="card"><div class="meal-head"><h3 style="white-space:nowrap">🎯 Οι στόχοι σου</h3><button class="chip" data-act="wizard">🧮 Επανυπολογισμός</button></div>
@@ -1485,6 +1790,24 @@ function renderSettings(){
 
   <section class="card"><h3>🔔 Υπενθυμίσεις</h3>${remCard()}</section>
 
+  <section class="card links">
+    <button class="lrow" data-act="setPage" data-v="more"><span class="e">⚙️</span><span class="t"><b>Περισσότερες ρυθμίσεις</b><small>Οδηγός διατροφής, AI, εμφάνιση, streak, τρόφιμα, δεδομένα</small></span></button>
+    <button class="lrow" data-act="chat"><span class="e">💬</span><span class="t"><b>Βοήθεια</b><small>Ο Nutri εξηγεί κάθε λειτουργία της εφαρμογής</small></span></button>
+  </section>
+  <button class="btn block" data-act="logout">Αποσύνδεση</button>
+  <div class="legal" style="margin-top:14px"><a href="privacy.html">Πολιτική Απορρήτου</a><a href="terms.html">Όροι Χρήσης</a></div>
+  <p class="small muted" style="text-align:center;margin-top:0">NutriLog · έκδοση 5 · Δεδομένα προϊόντων: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a> (ODbL)</p>`;
+}
+function renderMore(){
+  const g=S.goals,st=S.settings,tol=(+st.tolerance||10)/100;
+  if(!models.list&&!models.loading&&!models.err)setTimeout(loadModels,0);
+  return`<button class="link" data-act="setPage" data-v="" style="margin-top:12px">‹ Προφίλ</button>
+  <div class="page-title" style="margin-top:6px">Περισσότερες ρυθμίσεις</div>
+
+  <section class="card links">
+    <button class="lrow" data-act="guide"><span class="e">📚</span><span class="t"><b>Οδηγός διατροφής</b><small>Τι κάνει κάθε θρεπτικό, πώς διαβάζεις μια ετικέτα, πώς καταγράφεις με ακρίβεια</small></span></button>
+  </section>
+
   <section class="card"><h3>🔥 Κανόνες streak</h3>
     <div class="setrow first"><div class="t"><b>Ανοχή θερμίδων</b><small>Η μέρα μετράει ως επιτυχία αν είσαι μέσα σε αυτό το εύρος</small></div><b id="tolVal" style="font-size:18px">±${st.tolerance}%</b></div>
     <input type="range" min="5" max="25" step="1" value="${st.tolerance}" data-set="settings.tolerance" aria-label="Ανοχή θερμίδων">
@@ -1501,22 +1824,115 @@ function renderSettings(){
 
   <section class="card"><h3>⭐ Τα τρόφιμα & γεύματά μου</h3>
     ${S.savedMeals.length?`<div class="small muted" style="font-weight:700;margin-bottom:2px">Αποθηκευμένα γεύματα</div>`+S.savedMeals.map((m,i)=>`<div class="custom-row"><span><b>${esc(m.name)}</b> <span class="small muted">${m.items.length} τρόφιμα · ${r0(m.items.reduce((a,x)=>a+(+x.kcal||0),0))} kcal</span></span><button class="del" data-act="delSavedMeal" data-i="${i}" aria-label="Διαγραφή">×</button></div>`).join(''):''}
-    ${S.customFoods.length?`<div class="small muted" style="font-weight:700;margin:${S.savedMeals.length?'12px':'0'} 0 2px">Δικά μου τρόφιμα</div>`+S.customFoods.map((f,i)=>`<div class="custom-row"><span><b>${esc(f.name)}</b> <span class="small muted">${r0(f.per.kcal)} kcal/100g${f.code?' · 🏷️':''}</span></span><button class="del" data-act="delCustom" data-i="${i}" aria-label="Διαγραφή">×</button></div>`).join(''):''}
-    ${!S.savedMeals.length&&!S.customFoods.length?'<p class="muted small" style="margin:0">Πάτα «⭐ Αποθήκευση» σε ένα γεύμα για να το βάζεις με ένα πάτημα, ή φτιάξε δικό σου τρόφιμο από «+ Προσθήκη» → «Νέο».</p>':''}
+    ${S.customFoods.length?`<div class="small muted" style="font-weight:700;margin:${S.savedMeals.length?'12px':'0'} 0 2px">Δικά μου τρόφιμα</div>`+S.customFoods.map((f,i)=>`<div class="custom-row"><span><b>${esc(f.name)}</b> <span class="small muted">${r0(f.per.kcal)} kcal/100g${f.label?' · 🧾':''}${f.code?' · 🏷️':''}</span></span><button class="del" data-act="delCustom" data-i="${i}" aria-label="Διαγραφή">×</button></div>`).join(''):''}
+    ${!S.savedMeals.length&&!S.customFoods.length?'<p class="muted small" style="margin:0">Πάτα «⭐ Αποθήκευση γεύματος» σε ένα γεύμα για να το βάζεις με ένα πάτημα, ή σκάναρε μια ετικέτα για να κρατήσεις το προϊόν με τις ακριβείς τιμές του.</p>':''}
   </section>
 
   <section class="card"><h3>💾 Δεδομένα</h3>
     <p class="small muted" style="margin-top:-6px">Αποθηκεύονται στον λογαριασμό σου (servers στην ΕΕ) και είναι ίδια σε όλες τις συσκευές σου.</p>
     <div class="row" style="flex-wrap:wrap"><button class="btn" data-act="export">⬇️ Εξαγωγή</button><button class="btn" data-act="import">⬆️ Εισαγωγή</button><button class="btn danger" data-act="reset">Μηδενισμός δεδομένων</button></div></section>
 
-  <section class="card"><div class="setrow first" style="padding:0"><div class="t"><b>💬 Χρειάζεσαι βοήθεια;</b><small>Ο Nutri εξηγεί κάθε λειτουργία της εφαρμογής</small></div><button class="btn primary" data-act="chat">Ρώτα τον Nutri</button></div></section>
-
   <section class="card danger-zone"><h3>⚠️ Διαγραφή λογαριασμού</h3>
     <p class="small muted" style="margin-top:-6px">Διαγράφει οριστικά τον λογαριασμό σου και όλα τα δεδομένα σου (καταγραφές, στόχους, τρόφιμα, ειδοποιήσεις) από τους servers. Δεν αναιρείται. Αν θέλεις, κάνε πρώτα εξαγωγή.</p>
-    <button class="btn danger block" data-act="deleteAccount">Διαγραφή λογαριασμού</button></section>
-  <div class="legal"><a href="privacy.html">Πολιτική Απορρήτου</a><a href="terms.html">Όροι Χρήσης</a></div>
-  <p class="small muted" style="text-align:center;margin-top:0">NutriLog · έκδοση 4 · Δεδομένα προϊόντων: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a> (ODbL)</p>`;
+    <button class="btn danger block" data-act="deleteAccount">Διαγραφή λογαριασμού</button></section>`;
 }
+
+/* ---------- Οδηγός θρεπτικών ---------- */
+function guideToday(n){
+  const tk=todayK(),t=totals(tk);
+  if(n==='water'){const w=(S.days[tk]||{}).water||0;return`Σήμερα: <b>${fmtL(w)} L</b> από ${fmtL(S.goals.water)} L`}
+  if(NK.includes(n))return hasE(tk)?`Σήμερα: <b>${r0(t[n])} ${NU[n]}</b> από ${r0(S.goals[n])} ${NU[n]}${LIMITS.has(n)?' (όριο)':''}`:'';
+  const mt=microTotals(tk);if(!mt.known)return'';
+  return`Σήμερα: <b>${NU[n]==='mg'?r0(mt.t[n]):fmtN(r1(mt.t[n]))} ${NU[n]}</b> από ${microTargets()[n]} ${NU[n]}${LIMITS.has(n)?' (όριο)':''} · από ${mt.known}/${mt.total} τρόφιμα με στοιχεία`;
+}
+function guideBody(n){const g=GUIDE[n],td=guideToday(n);
+  return`<div class="gd-body"><p>${g.what}</p>
+    <h5>Τι κάνει</h5><ul>${g.does.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <h5>Πού θα το βρεις</h5><p>${g.src}</p>
+    <h5>Πόσο χρειάζεσαι</h5><p>${g.need()}</p>${td?`<div class="info">${td}</div>`:''}
+    <div class="note" style="margin-top:10px">💡 ${g.tip}</div></div>`}
+const gIcon=n=>`<span class="e" style="background:color-mix(in srgb,${NC[n]||'var(--accent)'} 16%,var(--card))">${GUIDE[n].e}</span>`;
+function openGuide(n){
+  let h;
+  if(n&&GUIDE[n]){const g=GUIDE[n];
+    h=`<div class="sheet-head"><div class="gd-h">${gIcon(n)}<div><h3 style="margin:0">${g.t}</h3><small class="muted" style="font-weight:600">${g.s}</small></div></div><button class="icon-btn" data-act="closeInfo" aria-label="Κλείσιμο">✕</button></div>
+      <div class="sheet-scroll">${guideBody(n)}<button class="btn block" style="margin:4px 0 6px" data-act="guide">📚 Όλος ο οδηγός διατροφής</button></div>`;
+  }else{
+    h=`<div class="sheet-head"><h3>📚 Οδηγός διατροφής</h3><button class="icon-btn" data-act="closeInfo" aria-label="Κλείσιμο">✕</button></div>
+      <div class="sheet-scroll"><p class="small muted" style="margin:0 0 6px">Πώς να καταγράφεις σωστά, πώς να διαβάζεις μια ετικέτα, και τι κάνει κάθε θρεπτικό συστατικό με βάση τους στόχους σου.</p>
+      <div class="gd-grp">Ξεκίνα εδώ</div>
+      <details class="gd"><summary><span class="e" style="background:var(--accent-soft)">🎯</span><b>Πώς καταγράφω με ακρίβεια<small>Ποιον τρόπο να διαλέξεις, συχνά λάθη</small></b></summary><div class="gd-body">${ACCURACY_GUIDE}</div></details>
+      <details class="gd"><summary><span class="e" style="background:var(--card2)">🧾</span><b>Πώς διαβάζω μια ετικέτα<small>Ανά 100 g, ανά μερίδα, αλάτι, % ΠΑ</small></b></summary><div class="gd-body">${LABEL_GUIDE}</div></details>
+      ${GUIDE_GROUPS.map(([gt,ks])=>`<div class="gd-grp">${gt}</div>`+ks.map(k=>`<details class="gd"><summary>${gIcon(k)}<b>${GUIDE[k].t}<small>${GUIDE[k].s}</small></b></summary>${guideBody(k)}</details>`).join('')).join('')}
+      <p class="small muted" style="margin:14px 0 8px">Γενικές πληροφορίες για υγιείς ενήλικες (με βάση συστάσεις ΠΟΥ και EFSA), όχι ιατρική συμβουλή. Για παθήσεις, εγκυμοσύνη ή φάρμακα, συμβουλέψου γιατρό ή διαιτολόγο.</p></div>`;
+  }
+  $('#infoIn').innerHTML=h;const d=$('#infoDlg');if(!d.open)d.showModal();
+  const sc=$('#infoIn .sheet-scroll');if(sc)sc.scrollTop=0;
+}
+
+/* ---------- Διατροφικά στοιχεία (σαν ετικέτα) ---------- */
+function nfHtml(v,title){
+  const f=(k,x)=>NU[k]==='mg'?(x>=10?r0(x):fmtN(r1(x))):fmtN(r1(x));
+  const row=(k,l,sub)=>v[k]==null?'':`<div class="r${sub?' sub':''}"><span>${l}</span><b>${f(k,v[k])} ${NU[k]}</b></div>`;
+  const vm=['calcium','iron','potassium','vitc'].some(k=>v[k]!=null);
+  return`<div class="nf"><h4>${title||'Διατροφικά στοιχεία'}</h4><div class="r thick"><span><b>Ενέργεια</b></span><b>${r0(v.kcal)} kcal</b></div>
+    ${row('fat','Λιπαρά')}${row('satfat','εκ των οποίων κορεσμένα',1)}${row('carbs','Υδατάνθρακες')}${row('sugar','εκ των οποίων σάκχαρα',1)}${row('fiber','Φυτικές ίνες')}${row('protein','Πρωτεΐνες')}
+    ${v.sodium!=null?`<div class="r"><span>Αλάτι</span><b>${fmtN(r2(v.sodium/400))} g</b></div>`:''}
+    ${vm?`<div class="r thick"><span class="small muted" style="font-weight:700">Βιταμίνες & μέταλλα</span><span></span></div>${row('calcium','Ασβέστιο')}${row('iron','Σίδηρος')}${row('potassium','Κάλιο')}${row('vitc','Βιταμίνη C')}`:''}</div>`;
+}
+
+/* ---------- Γεύμα (από το πλακίδιο στο Σήμερα) ---------- */
+let mealOpen=null;
+function openMeal(m){mealOpen=m;renderMeal();const d=$('#mealDlg');if(!d.open)d.showModal()}
+function renderMeal(){
+  const m=mealOpen,[,name,ic]=MEALS.find(x=>x[0]===m)||MEALS[3],k=dk(curDate);
+  const es=((S.days[k]||{}).entries||[]).filter(e=>e.meal===m),tot={kcal:0,protein:0,carbs:0,fat:0};
+  es.forEach(e=>{for(const n in tot)tot[n]+=+e[n]||0});
+  const yes=((S.days[dk(addDays(curDate,-1))]||{}).entries||[]).filter(e=>e.meal===m),ykc=yes.reduce((a,e)=>a+(+e.kcal||0),0);
+  $('#mealIn').innerHTML=`<div class="sheet-head"><div class="mh"><span class="mi" style="background:color-mix(in srgb,${MEAL_TINT[m]} 22%,var(--card))">${ic}</span><div class="mt"><b>${name}</b><small>${k===todayK()?'Σήμερα':fmtDate(curDate,{weekday:'long',day:'numeric',month:'short'})}</small></div></div>
+    <button class="icon-btn" data-act="closeMeal" aria-label="Κλείσιμο">✕</button></div>
+  <div class="sheet-scroll">
+    ${es.length?`<div class="meal-sum">${[['kcal','kcal'],['protein','Πρωτ.'],['carbs','Υδατ.'],['fat','Λιπ.']].map(([n,l])=>`<div><b>${r0(tot[n])}</b><span>${l}${n!=='kcal'?' (g)':''}</span></div>`).join('')}</div>`
+      :`<div class="info" style="margin-top:0">Δεν έχεις καταγράψει τίποτα ακόμα σε αυτό το γεύμα.</div>`}
+    ${es.map(e=>`<div class="entry" data-act="editEntry" data-id="${e.id}" role="button" tabindex="0"><div class="nm"><b>${esc(e.name)}${SRC_TAG[e.src]?`<span class="ai-tag">${SRC_TAG[e.src]}</span>`:''}</b>
+      <small>${e.grams?r0(e.grams)+' g · ':''}Π ${r1(e.protein)} · Υ ${r1(e.carbs)} · Λ ${r1(e.fat)}</small></div>
+      <span class="kc">${r0(e.kcal)}</span><button class="del" data-act="del" data-id="${e.id}" aria-label="Διαγραφή">×</button></div>`).join('')}
+    ${es.length?'<p class="small muted" style="margin:8px 0 0">Πάτα ένα τρόφιμο για να αλλάξεις ποσότητα ή γεύμα.</p>':''}
+    <button class="btn primary block lg" style="margin-top:14px" data-act="openAdd" data-meal="${m}">+ Προσθήκη τροφίμου</button>
+    <div class="row" style="margin-top:8px;flex-wrap:wrap">
+      ${!es.length&&yes.length?`<button class="btn" style="flex:1" data-act="copyYesterday" data-meal="${m}" title="${esc(yes.map(e=>e.name).join(', '))}">↺ Όπως χθες · ${r0(ykc)} kcal</button>`:''}
+      ${es.length?`<button class="btn" style="flex:1" data-act="saveMeal" data-meal="${m}">⭐ Αποθήκευση γεύματος</button>`:''}
+    </div>
+  </div>`;
+}
+
+/* ---------- Επεξεργασία καταχώρησης ---------- */
+function edEntry(){const d=ed&&S.days[ed.k];return d&&(d.entries||[]).find(e=>e.id===ed.id)}
+function edVals(){const e=edEntry(),o={};if(!e)return o;const f=ed.ratio();for(const k of ALLK)if(e[k]!=null)o[k]=r2((+e[k]||0)*f);return o}
+function openEntry(id){
+  const k=dk(curDate),e=((S.days[k]||{}).entries||[]).find(x=>x.id===id);if(!e)return;
+  const byG=+e.grams>0;
+  ed={k,id,byG,orig:byG?+e.grams:1,q:byG?+e.grams:1,meal:e.meal,name:e.name,ratio(){return this.orig>0?(+this.q||0)/this.orig:1}};
+  renderEntry();$('#entryDlg').showModal();
+}
+function edPrevHtml(){const v=edVals();return NK.slice(0,4).map(n=>`<div><b>${n==='kcal'?r0(v[n]):fmtN(r1(v[n]))}</b><span>${NL[n]}${n!=='kcal'?' (g)':''}</span></div>`).join('')}
+function renderEntry(){
+  const e=edEntry();if(!e){$('#entryDlg').close();return}
+  const src={ai:'Εκτίμηση AI',label:'Από την ετικέτα της συσκευασίας',barcode:'Barcode · Open Food Facts',off:'Open Food Facts',quick:'Γρήγορη καταχώρηση'}[e.src]||'Βάση τροφίμων NutriLog';
+  $('#entryIn').innerHTML=`<div class="sheet-head"><h3>Επεξεργασία</h3><button class="icon-btn" data-act="closeEntry" aria-label="Κλείσιμο">✕</button></div>
+  <div class="sheet-scroll">
+    <label class="f" style="margin-top:0" for="edName">Όνομα</label><input type="text" id="edName" data-edname value="${esc(ed.name)}" maxlength="80">
+    <div class="small muted" style="margin-top:6px">${SRC_TAG[e.src]||'📒'} ${src}</div>
+    <label class="f" for="edQ">${ed.byG?'Ποσότητα (g)':'Μερίδες'}</label>
+    <div class="row"><input type="number" id="edQ" data-edq min="0" step="${ed.byG?1:0.5}" inputmode="decimal" value="${ed.q}"><span class="muted">${ed.byG?'g':'×'}</span></div>
+    <div class="chips">${(ed.byG?[[ed.orig/2,'½'],[ed.orig,'Αρχική ('+r0(ed.orig)+' g)'],[ed.orig*2,'×2']]:[[0.5,'½'],[1,'1'],[2,'2']]).map(([v,l])=>`<button class="chip" data-act="edSetQ" data-q="${v}">${l}</button>`).join('')}</div>
+    <div class="prev" id="edPrev" style="grid-template-columns:repeat(4,1fr)">${edPrevHtml()}</div>
+    <div id="edNf">${nfHtml(edVals(),'Διατροφικά στοιχεία ποσότητας')}</div>
+    <label class="f">Γεύμα</label><select data-edmeal>${MEALS.map(([m,n])=>`<option value="${m}" ${ed.meal===m?'selected':''}>${n}</option>`).join('')}</select>
+    <div class="row" style="margin-top:16px"><button class="btn danger" data-act="edDelete">Διαγραφή</button><button class="btn primary lg" style="flex:1" data-act="edSave">Αποθήκευση</button></div>
+  </div>`;
+}
+function refreshEntry(){const a=$('#edPrev'),b=$('#edNf');if(a)a.innerHTML=edPrevHtml();if(b)b.innerHTML=nfHtml(edVals(),'Διατροφικά στοιχεία ποσότητας')}
 
 /* ---------- Επεξεργασία προφίλ ---------- */
 let pe=null;
@@ -1650,7 +2066,7 @@ function openConsent(){
 }
 
 /* ---------- Βοηθός Nutri ---------- */
-const CHAT_SUGGEST=['Έφαγα 2 αυγά και ένα τοστ για πρωινό','Τι να φάω για να πιάσω την πρωτεΐνη μου;','Πώς δουλεύει η σάρωση barcode;','Τι είναι το streak και το πάγωμα;','Πώς υπολογίζονται οι στόχοι μου;','Πώς βάζω υπενθυμίσεις;'];
+const CHAT_SUGGEST=['Έφαγα 2 αυγά και ένα τοστ για πρωινό','Τι να φάω για να πιάσω την πρωτεΐνη μου;','Πώς σκανάρω την ετικέτα μιας συσκευασίας;','Σε τι βοηθούν οι φυτικές ίνες;','Τι είναι το streak και το πάγωμα;','Πώς υπολογίζονται οι στόχοι μου;','Πώς βάζω υπενθυμίσεις;'];
 function welcomeText(){return`Γεια σου ${firstName()}! 👋 Είμαι ο **Nutri**, ο βοηθός σου στο NutriLog.\n\nΜπορώ να:\n- σου εξηγήσω πώς λειτουργεί κάθε κομμάτι της εφαρμογής\n- **καταγράψω φαγητό** για σένα — απλώς γράψε μου τι έφαγες\n- σε βοηθήσω με ερωτήσεις διατροφής, αφού βλέπω τους στόχους σου και τι έχεις φάει σήμερα\n\nΔιάλεξε κάτι παρακάτω ή γράψε τη δική σου ερώτηση.`}
 function loadChat(){try{chat.msgs=JSON.parse(localStorage.getItem(chatKey()))||[]}catch(e){chat.msgs=[]}}
 function saveChat(){try{localStorage.setItem(chatKey(),JSON.stringify(chat.msgs.slice(-40)))}catch(e){}}
@@ -1675,7 +2091,7 @@ function renderChat(){
   const log=$('#chatLog');
   log.innerHTML=chat.msgs.map((m,mi)=>`<div class="bubble ${m.role}${m.err?' err':''}">${m.role==='user'?esc(m.text):md(m.text)}</div>`+((m.actions||[]).map((_,ai_)=>actionCard(m,mi,ai_)).join(''))).join('')+(chat.busy?'<div class="bubble model typing"><i></i><i></i><i></i></div>':'');
   const asked=chat.msgs.some(m=>m.role==='user');
-  $('#chatChips').innerHTML=asked?'':CHAT_SUGGEST.map(q=>`<button class="chip" data-act="chatAsk" data-q="${esc(q)}">${esc(q)}</button>`).join('');
+  $('#chatChips').innerHTML=asked?'':'<button class="chip" data-act="suggest">💡 Τι να φάω τώρα;</button>'+CHAT_SUGGEST.map(q=>`<button class="chip" data-act="chatAsk" data-q="${esc(q)}">${esc(q)}</button>`).join('');
   $('#chatSend').disabled=chat.busy;
   log.scrollTop=log.scrollHeight;
 }
@@ -1696,19 +2112,23 @@ async function sendChat(text){
 function recents(){
   const seen=new Set(),out=[];
   for(const k of Object.keys(S.days).sort().reverse()){
-    for(const e of [...(S.days[k].entries||[])].reverse()){if(!e.per||seen.has(e.name))continue;seen.add(e.name);out.push({name:e.name,per:e.per,portion:e.grams||100,plabel:'τελευταία φορά',src:'recent'});if(out.length>=8)return out}
+    for(const e of [...(S.days[k].entries||[])].reverse()){if(!e.per||seen.has(e.name))continue;seen.add(e.name);
+      out.push({name:e.name,per:e.per,portion:e.grams||100,plabel:'τελευταία φορά',src:'recent',osrc:e.src,last:{grams:e.grams,vals:Object.fromEntries(ALLK.filter(n=>e[n]!=null).map(n=>[n,e[n]]))}});if(out.length>=8)return out}
   }
   return out;
 }
-function foodRow(f,i){const tag={custom:'⭐',recent:'🕘',off:'🏷️',barcode:'🏷️'}[f.src]||'';
-  return`<button class="food-row" data-act="pick" data-i="${i}"><span><b>${esc(f.name)}</b><small>${r0(f.per.kcal)} kcal/100g · Π ${f.per.protein} · Υ ${f.per.carbs} · Λ ${f.per.fat}</small></span>${tag}</button>`}
+const NS_COL={a:'#038141',b:'#85bb2f',c:'#e5b700',d:'#ee8100',e:'#e63e11'};
+const nsBadge=g=>g?`<span class="ns" style="background:${NS_COL[g]}" title="Nutri-Score ${g.toUpperCase()}">${g.toUpperCase()}</span>`:'';
+function foodRow(f,i){const tag={custom:f.label?'🧾':'⭐',recent:'🕘',off:'🏷️',barcode:'🏷️'}[f.src]||'';
+  const row=`<button class="food-row" data-act="pick" data-i="${i}"><span><b>${esc(f.name)}</b><small>${f.src==='recent'?`${r0(f.last.vals.kcal)} kcal · ${r0(f.portion)} g την τελευταία φορά`:`${r0(f.per.kcal)} kcal/100g · Π ${f.per.protein} · Υ ${f.per.carbs} · Λ ${f.per.fat}`}</small></span>${tag}</button>`;
+  return f.src==='recent'?`<div class="fr">${row}<button class="qadd" data-act="quickPick" data-i="${i}" aria-label="Προσθήκη ${esc(f.name)} με την ίδια ποσότητα" title="Ίδια ποσότητα με την τελευταία φορά">+</button></div>`:row}
 function resultsHtml(){
   const q=norm(add.q.trim());
   const all=[...S.customFoods.map(f=>({...f,src:'custom'})),...FOODS];
   let h='';
   if(!q){
     const rc=recents();addList=[...rc,...all];
-    return(rc.length?`<h5>Πρόσφατα</h5>${rc.map((f,i)=>foodRow(f,i)).join('')}`:'')+`<h5>Όλα τα τρόφιμα</h5>`+all.map((f,i)=>foodRow(f,i+rc.length)).join('');
+    return(rc.length?`<h5>Πρόσφατα · πάτα + για ίδια ποσότητα</h5>${rc.map((f,i)=>foodRow(f,i)).join('')}`:'')+`<h5>Όλα τα τρόφιμα</h5>`+all.map((f,i)=>foodRow(f,i+rc.length)).join('');
   }
   const words=q.split(/\s+/);
   const local=all.filter(f=>{const n=norm(f.name);return words.every(w=>n.includes(w))});
@@ -1723,11 +2143,13 @@ function resultsHtml(){
     else if(!offItems.length)h+=`<p class="muted small" style="padding:6px 4px">Δεν βρέθηκαν προϊόντα. Δοκίμασε άλλη λέξη ή μάρκα.</p>`;
     else h+=offItems.map((f,i)=>foodRow(f,i+local.length)).join('');
   }else h+=`<button class="btn block" style="margin:6px 0" data-act="offSearch">🔎 Ψάξε «${esc(add.q.trim())}» σε εκατομμύρια προϊόντα</button>`;
-  h+=`<p class="muted small" style="padding:10px 4px">Δεν το βρίσκεις; <button class="link" data-act="addTab" data-t="quick">Γρήγορη καταχώρηση</button> · <button class="link" data-act="addTab" data-t="custom">Νέο τρόφιμο</button> · <button class="link" data-act="aiFromAdd">Σάρωση με AI</button></p>`;
+  h+=`<p class="muted small" style="padding:10px 4px">Δεν το βρίσκεις; <button class="link" data-act="addTab" data-t="quick">Γρήγορη καταχώρηση</button> · <button class="link" data-act="scanLabel">🧾 Ετικέτα</button> · <button class="link" data-act="aiFromAdd">Περιγραφή στο AI</button></p>`;
   return h;
 }
 function refreshResults(){const r=$('#results');if(r)r.innerHTML=resultsHtml()}
-function selPrev(){const v=scaled(add.sel.per,+add.grams||0);return NK.map(n=>`<div><b>${r0(v[n])}</b><span>${NL[n]}${n!=='kcal'?' (g)':''}</span></div>`).join('')}
+function selVals(){return add.sel.src==='recent'&&+add.grams===+add.sel.last.grams?add.sel.last.vals:foodVals(add.sel,+add.grams||0)}
+function selPrev(){const v=selVals();return NK.map(n=>`<div><b>${n==='kcal'?r0(v[n]):fmtN(r1(v[n]||0))}</b><span>${NL[n]}${n!=='kcal'?' (g)':''}</span></div>`).join('')}
+function refreshSel(){const a=$('#selPrev'),b=$('#selNf');if(a)a.innerHTML=selPrev();if(b)b.innerHTML=nfHtml(selVals(),'Για την ποσότητα που διάλεξες')}
 function mealSelect(){return`<select id="mealSel">${MEALS.map(([m,n])=>`<option value="${m}" ${add.meal===m?'selected':''}>${n}</option>`).join('')}</select>`}
 function renderAdd(){
   let h=`<div class="sheet-head"><h3>Προσθήκη · ${mealName(add.meal)}</h3><button class="icon-btn" data-act="closeDlg" aria-label="Κλείσιμο">✕</button></div>
@@ -1736,33 +2158,39 @@ function renderAdd(){
     const sc=add.scan||{};
     h+=`<div><button class="link" data-act="addTab" data-t="search">‹ Πίσω στην αναζήτηση</button></div>`;
     if(sc.state==='looking')h+=`<div style="text-align:center;padding:30px"><div class="spinner"></div><div class="muted">Αναζήτηση προϊόντος ${esc(sc.code)}…</div></div>`;
-    else if(sc.state==='notfound')h+=`<div class="info">Το προϊόν <b>${esc(sc.code)}</b> δεν υπάρχει ακόμα στη βάση.<br>Πρόσθεσέ το ως νέο τρόφιμο με τα στοιχεία της ετικέτας — την επόμενη φορά θα το βρίσκεις με σάρωση.</div>
-      <div class="row" style="margin-top:10px"><button class="btn primary" style="flex:1" data-act="newFromCode" data-code="${esc(sc.code)}">Νέο τρόφιμο</button><button class="btn" data-act="scan">Ξανά σάρωση</button></div>`;
+    else if(sc.state==='notfound')h+=`<div class="info">Το προϊόν <b>${esc(sc.code)}</b> δεν υπάρχει ακόμα στη βάση.<br>Φωτογράφισε τον πίνακα διατροφικών στοιχείων και θα το κρατήσουμε με τις ακριβείς τιμές της συσκευασίας. Την επόμενη φορά θα το βρίσκεις με σάρωση.</div>
+      <button class="btn primary block" style="margin-top:10px" data-act="labelFromCode" data-code="${esc(sc.code)}">🧾 Φωτογραφία ετικέτας</button>
+      <div class="row" style="margin-top:8px"><button class="btn" style="flex:1" data-act="newFromCode" data-code="${esc(sc.code)}">✏️ Χειροκίνητα</button><button class="btn" style="flex:1" data-act="scan">Ξανά σάρωση</button></div>`;
     else h+=`<div class="scanbox" style="margin-top:10px"><div id="reader"></div></div>
       <div class="small ${sc.state==='error'?'':'muted'}" id="scanMsg" style="margin-top:8px;${sc.state==='error'?'color:var(--danger)':''}">${sc.state==='error'?esc(sc.msg):'Άνοιγμα κάμερας…'}</div>
       <div class="row" style="margin-top:10px"><input type="text" id="codeIn" inputmode="numeric" placeholder="ή γράψε τον κωδικό (π.χ. 5201…)" autocomplete="off"><button class="btn" data-act="codeGo">OK</button></div>
       <button class="btn block" style="margin-top:8px" data-act="barcodeFile">🖼️ Από φωτογραφία του barcode</button>`;
   }else if(add.tab==='search'){
-    if(add.sel){const f=add.sel;
+    if(add.sel){const f=add.sel,v=selVals(),pkg=f.src==='barcode'||f.src==='off';
       h+=`<div class="sheet-scroll"><button class="link" data-act="unpick">‹ Πίσω στη λίστα</button>
-        <h3 style="margin:10px 0 2px">${esc(f.name)}</h3><div class="small muted">${r0(f.per.kcal)} kcal ανά 100 g${f.src==='barcode'||f.src==='off'?' · Open Food Facts':''}</div>
+        <h3 style="margin:10px 0 2px">${esc(f.name)}${nsBadge(f.ns)}</h3><div class="small muted">${r0(f.per.kcal)} kcal ανά 100 g${pkg?' · Open Food Facts':f.label?' · από την ετικέτα':''}</div>
         <label class="f">Ποσότητα (g)</label><input type="number" id="gramsIn" min="0" step="1" inputmode="decimal" value="${add.grams}" data-input="grams">
         <div class="chips">${f.portion?`<button class="chip" data-act="setG" data-g="${f.portion}">${esc(f.plabel||'μερίδα')} (${f.portion} g)</button><button class="chip" data-act="setG" data-g="${f.portion*2}">2 × (${f.portion*2} g)</button>`:''}<button class="chip" data-act="setG" data-g="100">100 g</button></div>
         <div class="prev" id="selPrev">${selPrev()}</div>
+        <details class="acc"><summary>📋 Όλα τα διατροφικά στοιχεία</summary><div id="selNf">${nfHtml(v,'Για την ποσότητα που διάλεξες')}</div></details>
+        ${pkg&&f.code?`<p class="small muted" style="margin:10px 0 0">Οι τιμές της κοινότητας Open Food Facts μπορεί να διαφέρουν από τη συσκευασία σου. <button class="link" data-act="labelFromCode" data-code="${esc(f.code)}">🧾 Σκάναρε την ετικέτα</button> για ακριβείς τιμές.</p>`:''}
         <label class="f">Γεύμα</label>${mealSelect()}
         <button class="btn primary block lg" style="margin-top:14px" data-act="addSel">Προσθήκη</button></div>`;
-    }else h+=`<div class="row"><input type="search" id="q" data-input="q" placeholder="Αναζήτηση… (π.χ. γιαούρτι, ΦΑΓΕ)" value="${esc(add.q)}" autocomplete="off"><button class="btn" data-act="scan" title="Σάρωση barcode" style="white-space:nowrap">📷 Barcode</button></div><div class="results" id="results">${resultsHtml()}</div>`;
+    }else h+=`<input type="search" id="q" data-input="q" placeholder="Αναζήτηση… (π.χ. γιαούρτι, ΦΑΓΕ)" value="${esc(add.q)}" autocomplete="off">
+      <div class="srcs"><button data-act="scan"><span>🏷️</span>Barcode</button><button data-act="scanLabel"><span>🧾</span>Ετικέτα</button><button data-act="scanMeal"><span>📸</span>Πιάτο (AI)</button></div>
+      <div class="results" id="results">${resultsHtml()}</div>`;
   }else if(add.tab==='meals'){
     h+=S.savedMeals.length?`<div class="results" style="margin-top:0">${S.savedMeals.map((m,i)=>`<button class="food-row" data-act="useSavedMeal" data-i="${i}"><span><b>${esc(m.name)}</b><small>${esc(m.items.map(x=>x.name).join(', '))}</small></span><b>${r0(m.items.reduce((a,x)=>a+(+x.kcal||0),0))}</b></button>`).join('')}</div>`
-      :`<div class="info" style="margin-top:0">Δεν έχεις αποθηκευμένα γεύματα ακόμα. Γέμισε ένα γεύμα στο «Σήμερα» και πάτα <b>⭐ Αποθήκευση</b> — μετά θα το βάζεις εδώ με ένα πάτημα.</div>`;
+      :`<div class="info" style="margin-top:0">Δεν έχεις αποθηκευμένα γεύματα ακόμα. Γέμισε ένα γεύμα στο «Σήμερα» και πάτα <b>⭐ Αποθήκευση γεύματος</b>, για να το βάζεις εδώ με ένα πάτημα.</div>`;
   }else if(add.tab==='quick'){
-    h+=`<div class="sheet-scroll"><p class="small muted" style="margin:0">Κατέγραψε απευθείας θερμίδες και μακροθρεπτικά (π.χ. από ετικέτα ή εστιατόριο).</p>
+    h+=`<div class="sheet-scroll"><p class="small muted" style="margin:0">Κατέγραψε απευθείας θερμίδες και μακροθρεπτικά (π.χ. από εστιατόριο).</p>
       <label class="f">Περιγραφή</label><input type="text" id="qa_name" placeholder="π.χ. Σάντουιτς καφετέριας">
       <div class="form3">${NK.map(n=>`<div><label class="f">${NL[n]} (${NU[n]})</label><input type="number" id="qa_${n}" min="0" step="0.1" inputmode="decimal"></div>`).join('')}</div>
       <label class="f">Γεύμα</label>${mealSelect()}
       <button class="btn primary block lg" style="margin-top:14px" data-act="quickAdd">Προσθήκη</button></div>`;
   }else{
-    h+=`<div class="sheet-scroll"><p class="small muted" style="margin:0">Αποθήκευσε ένα τρόφιμο με τιμές <b>ανά 100 g</b> (από τη συσκευασία) για να το βρίσκεις στην αναζήτηση.</p>
+    h+=`<div class="sheet-scroll"><button class="btn primary block" data-act="labelFromCode" data-code="${esc(add.prefillCode||'')}">🧾 Συμπλήρωση από φωτογραφία ετικέτας</button>
+      <p class="small muted" style="margin:12px 0 0">ή συμπλήρωσε χειροκίνητα τις τιμές <b>ανά 100 g</b> από τη συσκευασία:</p>
       <label class="f">Όνομα</label><input type="text" id="cf_name" placeholder="π.χ. Μπάρα πρωτεΐνης X">
       <div class="form3">${NK.map(n=>`<div><label class="f">${NL[n]} /100g</label><input type="number" id="cf_${n}" min="0" step="0.1" inputmode="decimal"></div>`).join('')}
         <div><label class="f">Κορεσμένα /100g</label><input type="number" id="cf_satfat" min="0" step="0.1" inputmode="decimal"></div>
@@ -1782,19 +2210,23 @@ function addSavedItems(k,meal,items,src){items.forEach(it=>{const e={...it,meal}
 
 /* ---------- Ενέργειες ---------- */
 const A={
-  tab:el=>{tab=el.dataset.tab;render();window.scrollTo(0,0)},
-  day:el=>{curDate=addDays(curDate,+el.dataset.d);if(dk(curDate)>todayK())curDate=new Date();render()},
+  tab:el=>{tab=el.dataset.tab;setPage='';render();window.scrollTo(0,0)},
+  setPage:el=>{setPage=el.dataset.v||'';render();window.scrollTo(0,0)},
+  day:el=>{const d=+el.dataset.d;curDate=d?addDays(curDate,d):new Date();if(dk(curDate)>todayK())curDate=new Date();render()},
   water:el=>{const d=dayObj(dk(curDate));d.water=Math.max(0,(d.water||0)+(+el.dataset.v));save();render()},
   del:el=>{const d=S.days[dk(curDate)];if(!d)return;const i=d.entries.findIndex(e=>e.id===el.dataset.id);if(i<0)return;const [rm]=d.entries.splice(i,1);save();render();toast(`Διαγράφηκε: ${rm.name}`)},
   openAdd:el=>openAdd(el.dataset.meal),
   closeDlg:closeAdd,
   addTab:el=>{stopScanner();add.tab=el.dataset.t;add.sel=null;add.scan=null;if(el.dataset.t!=='custom')add.prefillCode='';renderAdd()},
   pick:el=>{const f=addList[+el.dataset.i];if(!f)return;add.sel=f;add.grams=f.portion||100;renderAdd()},
+  quickPick:el=>{const f=addList[+el.dataset.i];if(!f||el.disabled)return;
+    addEntry(dk(curDate),{meal:add.meal,name:f.name,grams:f.last.grams,per:f.per,...f.last.vals,src:entrySrc(f)});
+    el.textContent='✓';el.disabled=true;render()},
   unpick:()=>{add.sel=null;renderAdd()},
-  setG:el=>{add.grams=+el.dataset.g;$('#gramsIn').value=add.grams;$('#selPrev').innerHTML=selPrev()},
+  setG:el=>{add.grams=+el.dataset.g;$('#gramsIn').value=add.grams;refreshSel()},
   addSel:()=>{const g=+add.grams;if(!(g>0)){toast('Δώσε ποσότητα σε γραμμάρια');return}
-    const f=add.sel,src=f.src==='barcode'?'barcode':f.src==='off'?'off':'db';
-    addEntry(dk(curDate),{meal:add.meal,name:f.name,grams:g,per:f.per,...scaled(f.per,g),src});closeAdd();render();toast(`Προστέθηκε: ${f.name}`)},
+    const f=add.sel;
+    addEntry(dk(curDate),{meal:add.meal,name:f.name,grams:g,per:f.per,...selVals(),src:entrySrc(f)});closeAdd();render();toast(`Προστέθηκε: ${f.name}`)},
   quickAdd:()=>{const name=($('#qa_name').value||'').trim()||'Γρήγορη καταχώρηση',v={};NK.forEach(n=>v[n]=numVal('qa_'+n));
     if(!v.kcal){toast('Συμπλήρωσε τουλάχιστον τις θερμίδες');return}
     addEntry(dk(curDate),{meal:add.meal,name,grams:0,...v,src:'quick'});closeAdd();render();toast(`Προστέθηκε: ${name}`)},
@@ -1805,10 +2237,16 @@ const A={
     const f={name,per,portion:numVal('cf_portion')||100,plabel:($('#cf_plabel').value||'').trim()||'μερίδα',...(code?{code}:{})};
     if(code)S.customFoods=S.customFoods.filter(x=>x.code!==code);
     S.customFoods.push(f);save();add.tab='search';add.sel={...f,src:code?'barcode':'custom'};add.grams=f.portion;add.prefillCode='';renderAdd();toast('Το τρόφιμο αποθηκεύτηκε')},
-  aiFromAdd:()=>{ai.desc=add.q;closeAdd();tab='ai';render()},
+  aiFromAdd:()=>{const o={desc:add.q,meal:add.meal,day:dk(curDate)};closeAdd();openScan('meal',o)},
+  scanMeal:()=>{const o={meal:add.meal,day:dk(curDate)};closeAdd();openScan('meal',o)},
+  scanLabel:()=>{const o={meal:add.meal,day:dk(curDate)};closeAdd();openScan('label',o)},
+  labelFromCode:el=>{const o={meal:add.meal,day:dk(curDate),code:el.dataset.code||''};closeAdd();openScan('label',o)},
+  openScan:el=>openScan(el.dataset.mode||'meal',{day:dk(curDate)}),
+  closeScan:()=>$('#scanDlg').close(),
+  scanMode:el=>{if(ai.mode===el.dataset.v)return;ai.mode=el.dataset.v;ai.result=null;ai.label=null;ai.error='';renderScan()},
   offSearch,
   scan:()=>{add.sel=null;startScanner()},
-  scanFromAI:()=>{openAdd(guessMeal());startScanner()},
+  scanFromAI:()=>{const d=$('#scanDlg');if(d.open)d.close();openAdd(guessMeal());startScanner()},
   codeGo:()=>onBarcode($('#codeIn').value),
   barcodeFile:()=>$('#fileBarcode').click(),
   newFromCode:el=>{add.tab='custom';add.prefillCode=el.dataset.code;add.scan=null;renderAdd()},
@@ -1830,20 +2268,45 @@ const A={
   review:el=>makeReview(el.dataset.k),
   pview:el=>{prog.view=el.dataset.v;render()},
   pnav:el=>{const d=+el.dataset.d,a=prog.anchor;
-    if(prog.view==='day')prog.anchor=addDays(a,d);
-    else if(prog.view==='week')prog.anchor=addDays(a,7*d);
+    if(prog.view==='week')prog.anchor=addDays(a,7*d);
     else if(prog.view==='month')prog.anchor=new Date(a.getFullYear(),a.getMonth()+d,1);
     else prog.anchor=new Date(a.getFullYear()+d,0,1);
     if(prog.anchor>new Date())prog.anchor=new Date();render()},
-  gotoDay:el=>{prog.view='day';prog.anchor=pk(el.dataset.k);render();window.scrollTo(0,0)},
-  editDay:el=>{curDate=pk(el.dataset.k);tab='today';render();window.scrollTo(0,0)},
+  gotoDay:el=>{curDate=pk(el.dataset.k);tab='today';render();window.scrollTo(0,0)},
   pickImg:el=>$(el.dataset.src==='cam'?'#fileCam':'#fileGal').click(),
-  clearImg:()=>{ai.img=ai.b64=null;ai.result=null;ai.error='';render()},
   analyze,
-  aiAdd:()=>{const R=ai.result;if(!R)return;const k=todayK();let n=0;
+  aiAdd:()=>{const R=ai.result;if(!R)return;const k=ai.day||todayK();let n=0;
     R.items.forEach(it=>{if(!it.on||!(it.grams>0))return;dayObj(k).entries.push({id:uid(),...itemToEntry({...itemVals(it),name:it.name,grams:it.grams},ai.meal,'ai')});n++});
     if(!n){toast('Δεν επιλέχθηκε κανένα στοιχείο');return}
-    save();toast(`Προστέθηκαν ${n} στοιχεία στο ${mealName(ai.meal)}`);ai={img:null,b64:null,desc:'',loading:false,error:'',result:null,meal:guessMeal()};curDate=new Date();tab='today';render();window.scrollTo(0,0)},
+    save();$('#scanDlg').close();curDate=pk(k);tab='today';render();window.scrollTo(0,0);toast(`Προστέθηκαν ${n} στοιχεία στο ${mealName(ai.meal)}`)},
+  lbSetG:el=>{ai.label.g=+el.dataset.g;$('#lbG').value=ai.label.g;refreshLabel()},
+  labelAdd:()=>{const L=ai.label;if(!L)return;const g=+L.g,base=lbBase(L);
+    if(base.kcal==null){toast('Συμπλήρωσε τις θερμίδες (kcal) από την ετικέτα');return}
+    if(!(g>0)){toast('Δώσε ποσότητα');return}
+    const name=(L.product||'').trim().slice(0,80)||'Προϊόν (ετικέτα)',per=fixVals(base),k=ai.day||todayK();
+    dayObj(k).entries.push({id:uid(),meal:ai.meal,name,grams:r2(g),per,...fixVals(lbCalc(L,g)),src:'label'});
+    if(L.save){
+      const code=String(L.code||'').replace(/\D/g,''),s=L.srv&&L.srv.size?labelPer(L.srv.v):null;
+      const f={name,per,portion:L.srv&&L.srv.size?L.srv.size:100,plabel:L.srv&&L.srv.size?(L.srv.label.replace(/\s*\(.*\)\s*$/,'')||'μερίδα'):`100 ${L.unit}`,label:true,
+        ...(s&&s.kcal!=null?{srv:fixVals(s)}:{}),...(code?{code}:{})};
+      S.customFoods=S.customFoods.filter(x=>code?x.code!==code:norm(x.name)!==norm(name));S.customFoods.push(f);
+    }
+    save();$('#scanDlg').close();curDate=pk(k);tab='today';render();window.scrollTo(0,0);toast(`Προστέθηκε: ${name}${L.save?' · ⭐ αποθηκεύτηκε':''}`)},
+  // γεύμα, επεξεργασία καταχώρησης & οδηγός
+  openMeal:el=>openMeal(el.dataset.meal),
+  closeMeal:()=>{$('#mealDlg').close();mealOpen=null},
+  editEntry:el=>openEntry(el.dataset.id),
+  closeEntry:()=>{$('#entryDlg').close();ed=null},
+  edSetQ:el=>{ed.q=+el.dataset.q;$('#edQ').value=r2(ed.q);refreshEntry()},
+  edSave:()=>{const e=edEntry();if(!e)return;const q=+ed.q;if(!(q>0)){toast(ed.byG?'Δώσε ποσότητα σε γραμμάρια':'Δώσε αριθμό μερίδων');return}
+    const v=edVals();for(const k of ALLK)if(v[k]!=null)e[k]=v[k];
+    if(ed.byG)e.grams=r2(q);e.meal=ed.meal;e.name=(ed.name||'').trim().slice(0,80)||e.name;
+    save();$('#entryDlg').close();ed=null;render();toast('✓ Αποθηκεύτηκε')},
+  edDelete:()=>{const d=S.days[ed.k];const i=d?d.entries.findIndex(e=>e.id===ed.id):-1;if(i<0)return;const [rm]=d.entries.splice(i,1);
+    save();$('#entryDlg').close();ed=null;render();toast(`Διαγράφηκε: ${rm.name}`)},
+  info:el=>openGuide(el.dataset.n),
+  guide:el=>openGuide(el.dataset.n||''),
+  closeInfo:()=>$('#infoDlg').close(),
   reloadModels:()=>{models.err='';loadModels()},
   theme:el=>{S.settings.theme=el.dataset.v;applyTheme(S.settings.theme);save();const y=window.scrollY;render();window.scrollTo(0,y)},
   delCustom:el=>{const f=S.customFoods[+el.dataset.i];if(f&&confirm(`Διαγραφή «${f.name}»;`)){S.customFoods.splice(+el.dataset.i,1);save();render()}},
@@ -1911,7 +2374,7 @@ document.addEventListener('click',e=>{
   const el=e.target.closest('[data-act]');if(!el||el.disabled)return;
   const f=A[el.dataset.act];if(f){e.preventDefault();f(el,e)}
 });
-['#dlg','#chatDlg','#sugDlg','#profDlg'].forEach(s=>$(s).addEventListener('click',e=>{if(e.target===$(s)){if(s==='#dlg')closeAdd();else $(s).close()}}));
+['#dlg','#chatDlg','#sugDlg','#profDlg','#scanDlg','#mealDlg','#entryDlg','#infoDlg'].forEach(s=>$(s).addEventListener('click',e=>{if(e.target===$(s)){if(s==='#dlg')closeAdd();else $(s).close()}}));
 $('#dlg').addEventListener('close',stopScanner);
 $('#wizDlg').addEventListener('cancel',e=>{if(wiz&&wiz.first){e.preventDefault();return}wiz=null});
 $('#consentDlg').addEventListener('cancel',e=>e.preventDefault());
@@ -1920,12 +2383,18 @@ $('#chatForm').addEventListener('submit',e=>{e.preventDefault();const i=$('#chat
 $('#chatIn').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('#chatForm').requestSubmit()}});
 $('#chatIn').addEventListener('input',e=>{e.target.style.height='';e.target.style.height=Math.min(120,e.target.scrollHeight)+'px'});
 document.addEventListener('submit',e=>{if(e.target.id==='authForm'){e.preventDefault();authSubmit(e.target)}});
-document.addEventListener('toggle',e=>{if(e.target.id==='microCard')try{sessionStorage.setItem('microOpen',e.target.open?'1':'0')}catch(x){}},true);
+document.addEventListener('toggle',e=>{const t=e.target;if(t.dataset&&t.dataset.keep!==undefined)try{sessionStorage.setItem('open-'+t.id,t.open?'1':'0')}catch(x){}},true);
 document.addEventListener('input',e=>{
   const el=e.target;
   if(el.dataset.input==='q'){add.q=el.value;refreshResults();const r=$('#results');if(r)r.scrollTop=0}
-  else if(el.dataset.input==='grams'){add.grams=parseFloat(el.value)||0;$('#selPrev').innerHTML=selPrev()}
+  else if(el.dataset.input==='grams'){add.grams=parseFloat(el.value)||0;refreshSel()}
   else if(el.dataset.input==='aidesc')ai.desc=el.value;
+  else if(el.dataset.lb&&ai.label){const [s,k]=el.dataset.lb.split('.'),o=s==='p'?ai.label.p:ai.label.srv.v,v=parseFloat(String(el.value).replace(',','.'));o[k]=isNaN(v)?null:v;refreshLabel()}
+  else if(el.dataset.lbname!==undefined&&ai.label)ai.label.product=el.value;
+  else if(el.dataset.lbg!==undefined&&ai.label){ai.label.g=parseFloat(el.value)||0;refreshLabel()}
+  else if(el.dataset.lbcode!==undefined&&ai.label)ai.label.code=el.value;
+  else if(el.dataset.edq!==undefined&&ed){ed.q=parseFloat(el.value)||0;refreshEntry()}
+  else if(el.dataset.edname!==undefined&&ed)ed.name=el.value;
   else if(el.dataset.ainame!==undefined&&ai.result)ai.result.items[+el.dataset.ainame].name=el.value;
   else if(el.dataset.pe&&pe&&el.tagName==='INPUT'){const f=el.dataset.pe;pe.p[f]=f==='name'?el.value:(el.value===''?null:parseFloat(el.value))}
   else if(el.dataset.wiz&&wiz){const f=el.dataset.wiz;wiz.p[f]=f==='name'?el.value:parseFloat(el.value)}
@@ -1953,13 +2422,15 @@ document.addEventListener('change',async e=>{
   }
   if(el.dataset.rem){const r=S.settings.reminders,k=el.dataset.rem;r[k]=el.type==='checkbox'?el.checked:el.value;save();syncRemPrefs();
     if(el.type==='checkbox'){const y=window.scrollY;render();window.scrollTo(0,y)}return}
-  if(el.dataset.weight){const v=parseFloat(String(el.value).replace(',','.'));const d=dayObj(el.dataset.weight);if(isNaN(v))delete d.weight;else{d.weight=r1(v);if(el.dataset.weight===todayK()&&v>=30&&v<=300)S.profile.weight=r1(v)}save();toast('Το βάρος αποθηκεύτηκε');return}
+  if(el.dataset.weight){const v=parseFloat(String(el.value).replace(',','.'));const d=dayObj(el.dataset.weight);if(isNaN(v))delete d.weight;else{d.weight=r1(v);if(el.dataset.weight===todayK()&&v>=30&&v<=300)S.profile.weight=r1(v)}save();toast('Το βάρος αποθηκεύτηκε');if(tab==='progress'){const y=window.scrollY;render();window.scrollTo(0,y)}return}
   if(el.dataset.wizagree!==undefined&&wiz){wiz.agree=el.checked;return}
   if(el.dataset.actmeal){const [mi,ai_]=el.dataset.actmeal.split(':').map(Number);const a=chat.msgs[mi]&&chat.msgs[mi].actions[ai_];if(a){a.meal=el.value;saveChat()}return}
   if(el.id==='mealSel'){add.meal=el.value;return}
   if(el.dataset.aimeal!==undefined){ai.meal=el.value;return}
-  if(el.dataset.aion!==undefined&&ai.result){ai.result.items[+el.dataset.aion].on=el.checked;render();return}
-  if(el.dataset.aigrams!==undefined&&ai.result){ai.result.items[+el.dataset.aigrams].grams=Math.max(0,parseFloat(el.value)||0);const y=window.scrollY;render();window.scrollTo(0,y);return}
+  if(el.dataset.aion!==undefined&&ai.result){ai.result.items[+el.dataset.aion].on=el.checked;renderScan();return}
+  if(el.dataset.aigrams!==undefined&&ai.result){ai.result.items[+el.dataset.aigrams].grams=Math.max(0,parseFloat(el.value)||0);renderScan();return}
+  if(el.dataset.lbsave!==undefined&&ai.label){ai.label.save=el.checked;return}
+  if(el.dataset.edmeal!==undefined&&ed){ed.meal=el.value;return}
   if(el.id==='fileCam'||el.id==='fileGal'){loadImage(el.files[0]);el.value='';return}
   if(el.id==='fileAvatar'){processAvatar(el.files[0]);el.value='';return}
   if(el.dataset.pe&&pe&&el.tagName==='SELECT'){pe.p[el.dataset.pe]=el.value;return}
@@ -1973,6 +2444,7 @@ document.addEventListener('change',async e=>{
       const c=S.consent;S=normalize(j);S.onboarded=true;S.consent=S.consent||c;save();applyTheme(S.settings.theme);render();toast('Η εισαγωγή ολοκληρώθηκε')}).catch(()=>toast('Μη έγκυρο αρχείο'))}
 });
 document.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&e.target.getAttribute&&e.target.getAttribute('role')==='button'&&e.target.dataset.act){e.preventDefault();e.target.click();return}
   if(e.key==='Enter'&&e.target.id==='gramsIn')A.addSel();
   if(e.key==='Enter'&&e.target.id==='codeIn')A.codeGo();
   if(e.key==='Enter'&&e.target.id==='q'){if(addList.length===1){add.sel=addList[0];add.grams=addList[0].portion||100;renderAdd()}else if(add.q.trim().length>=2&&!(add.off&&add.off.q===add.q.trim()))offSearch()}

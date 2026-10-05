@@ -1,7 +1,7 @@
 // Service worker: κρατά την εφαρμογή διαθέσιμη χωρίς σύνδεση και εμφανίζει τις ειδοποιήσεις push.
 // Άλλαξε το VERSION όταν ανεβάζεις νέα έκδοση ώστε να ανανεωθεί η cache.
-const VERSION = 'nutrilog-v6';
-const SHELL = ['./', './index.html', './config.js', './privacy.html', './terms.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+const VERSION = 'nutrilog-v7';
+const SHELL = ['./', './index.html', './config.js', './privacy.html', './terms.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './icon.svg', './apple-touch-icon.png'];
 const CDN = 'cdn.jsdelivr.net';
 
 self.addEventListener('install', e => {
